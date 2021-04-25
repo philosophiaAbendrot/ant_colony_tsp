@@ -1,15 +1,15 @@
+# update UML
+# 'x_coordinate' to 'x_pos'
+# 'y_coordinate' to 'y_pos'
+
 class Ant
-	attr_reader :visited_cities, :coordinate
+	attr_reader :visited_vertex_ids, :x_pos, :y_pos, :current_vertex_id, :visited_edge_ids
 
-	def select_next_city
-
-	end
-
-	def drop_pheromones
-
-	end
-
-	def return_path
-		
+	def initialize(start_vertex:, )
+		@current_vertex_id = start_vertex.id
+		@visited_edge_ids = []
+		@visited_vertex_ids = []
+		@x_pos = start_vertex.x_pos
+		@y_pos = start_vertex.y_pos
 	end
 end
