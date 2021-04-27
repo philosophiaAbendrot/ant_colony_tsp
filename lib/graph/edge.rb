@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + "/../../modules/databaseable"
-
 module Graph
 	class Edge
 		extend Databaseable

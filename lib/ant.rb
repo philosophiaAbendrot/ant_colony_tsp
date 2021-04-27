@@ -2,8 +2,6 @@
 # 'x_coordinate' to 'x_pos'
 # 'y_coordinate' to 'y_pos'
 
-require File.dirname(__FILE__) + "/../modules/databaseable"
-
 class Ant
 	extend Databaseable
 

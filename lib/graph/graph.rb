@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + "/../../modules/databaseable"
-
 module Graph
 	class Graph
 		extend Databaseable
@@ -8,6 +6,9 @@ module Graph
 
 		def initialize(edges:, vertices:)
 			# initialize edges and vertices
+
+			# edge input format
+			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
 
 			raise ArgumentError.new("Edges input is not an array") unless edges.is_a?(Array)
 

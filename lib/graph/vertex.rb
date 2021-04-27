@@ -1,5 +1,3 @@
-require File.dirname(__FILE__) + "/../../modules/databaseable"
-
 # need to add outgoing_edge_ids and incoming_edge_ids to UML
 # update UML
 # 'x_coordinate' to 'x_pos'
