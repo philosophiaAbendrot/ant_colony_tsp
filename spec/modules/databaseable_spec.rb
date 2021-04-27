@@ -1,15 +1,12 @@
 require File.dirname(__FILE__) + "/../../lib/modules/databaseable"
-require File.dirname(__FILE__) + "/../../lib/modules/identifiable"
 
 describe Databaseable do
 	class ChildClass
 		extend Databaseable
-		include Identifiable
 	end
 
 	class SecondChildClass
 		extend Databaseable
-		include Identifiable
 	end
 
 	context "when it is inherited in a child class" do

@@ -1,4 +1,12 @@
 module Databaseable
+	module Identifiable
+		attr_accessor :id
+	end
+
+	def self.extended(klass)
+		klass.include(Databaseable::Identifiable)
+	end
+
 	def find(id)
 		@instances[id]
 	end
