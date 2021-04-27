@@ -2,7 +2,11 @@
 # 'x_coordinate' to 'x_pos'
 # 'y_coordinate' to 'y_pos'
 
+require File.dirname(__FILE__) + "/../modules/databaseable"
+
 class Ant
+	extend Databaseable
+
 	attr_reader :visited_vertex_ids, :x_pos, :y_pos, :current_vertex_id, :visited_edge_ids
 
 	def initialize(start_vertex:, )

@@ -1,5 +1,9 @@
+require File.dirname(__FILE__) + "/../../modules/databaseable"
+
 module Graph
 	class Edge
+		extend Databaseable
+
 		attr_reader :id, :start_vertex_id, :end_vertex_id
 
 		def initialize(cost_of_traversal:, start_vertex:, end_vertex:)		
