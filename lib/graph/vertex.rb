@@ -11,7 +11,7 @@ module Graph
 
 		attr_reader :x_pos, :y_pos, :id, :edge_ids, :outgoing_edge_ids, :incoming_edge_ids
 
-		def initialize(x_pos:, y_pos:)
+		def initialize(x_pos:, y_pos:, id:)
 			@x_pos = x_pos
 			@y_pos = y_pos
 			@outgoing_edge_ids = []

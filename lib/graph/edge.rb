@@ -6,7 +6,7 @@ module Graph
 
 		attr_reader :id, :start_vertex_id, :end_vertex_id
 
-		def initialize(cost_of_traversal:, start_vertex:, end_vertex:)		
+		def initialize(id: , cost_of_traversal:, start_vertex_id:, end_vertex_id:)		
 			@cost_of_traversal = cost_of_traversal
 			@start_vertex = start_vertex
 			@end_vertex = end_vertex
