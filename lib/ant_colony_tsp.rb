@@ -1,11 +1,10 @@
-file_paths = [
-	"/../graph/edge.rb", "/../graph/vertex.rb", "/../graph/graph.rb",
-	"/../modules/databaseable.rb", "/../ant.rb"
-]
+paths = []
+paths += Dir[File.dirname(__FILE__) + "/modules/**/*.rb"]
+paths += Dir[File.dirname(__FILE__) + "/ant.rb"]
 
-file_paths.each do |path|
-	require File.dirname(__FILE__) + path
-end
+# Dir[File.dirname(__FILE__) + "/modules/**/*.rb"].each { |path| require path }
+# Dir[File.dirname(__FILE__) + "/ant.rb"].each { |path| require path }
+paths.each { |path| require path }
 
 class AntColonyTsp
 	attr_reader :time

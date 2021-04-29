@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
 	s.summary = "Uses a colony of virtual ants to solve the travelling salesman problem"
 	s.email = "tonytaesung.ha@gmail.com"
 	s.authors = ["Tony Ha"]
-	s.files = Dir["lib/**/*"]
+	s.files = Dir["{lib}/**/*"]
 	s.add_dependency("rspec", "3.10.0")
 	s.add_dependency("rspec-core", "3.10.1")
 	s.add_dependency("rspec-expectations", "3.10.1")

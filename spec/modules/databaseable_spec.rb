@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + "/../../lib/modules/databaseable"
+# require File.dirname(__FILE__) + "/../../lib/modules/databaseable"
+require File.dirname(__FILE__) + "/../spec_helper.rb"
 
 describe Databaseable do
 	class ChildClass
