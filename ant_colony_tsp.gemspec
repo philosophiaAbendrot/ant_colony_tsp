@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
 	s.name = "ant_colony_tsp"
-	s.version = 0.0.0
+	s.version = "0.0.0".freeze
 	s.licenses = ["MIT"]
 	s.summary = "Uses a colony of virtual ants to solve the travelling salesman problem"
 	s.email = "tonytaesung.ha@gmail.com"

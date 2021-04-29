@@ -4,3 +4,6 @@
 
 # ignore bundler config
 /.bundle
+
+# ignore installed gem
+/.gem
