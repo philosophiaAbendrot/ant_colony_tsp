@@ -1,3 +1,2 @@
-require "rubygems"
-require "bundler/setup"
+gem 'rspec'
 require 'ant_colony_tsp'
