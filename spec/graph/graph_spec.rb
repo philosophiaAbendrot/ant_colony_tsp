@@ -10,7 +10,8 @@ describe Graph::Graph do
 		end
 
 		after(:each) do
-			Graph::Graph.destroy_all
+			Graph::Edge.destroy_all
+			Graph::Vertex.destroy_all
 		end
 
 		describe "vertices should be generated" do

@@ -12,13 +12,17 @@ module Databaseable
 	end
 
 	def instances
-		@instances ||= {}
+		@instances || {}
 	end
 
 	def new(*arguments, &block)
 		instance = allocate
 		instance.send(:initialize, *arguments, &block)
+
+		@instances = {} unless @instances
+
 		@instances[instance.id] = instance
+
 		instance
 	end
 

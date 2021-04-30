@@ -5,9 +5,10 @@ module Graph
 		attr_reader :id, :start_vertex_id, :end_vertex_id
 
 		def initialize(id: , cost_of_traversal:, start_vertex_id:, end_vertex_id:)		
+			@id = id
 			@cost_of_traversal = cost_of_traversal
-			@start_vertex = start_vertex
-			@end_vertex = end_vertex
+			@start_vertex_id = start_vertex_id
+			@end_vertex_id = end_vertex_id
 			@pheromone_count = 0
 		end
 	end
