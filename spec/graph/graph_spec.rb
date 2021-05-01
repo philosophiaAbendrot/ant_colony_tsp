@@ -16,9 +16,6 @@ describe Graph::Graph do
 				allow(mock_edge_class).to receive(:new)
 			end
 
-			# let(:first_vertex) { Graph::Vertex.find(vertices[0][0]) }
-			# let(:second_vertex) { Graph::Vertex.find(vertices[1][0]) }
-
 			it "should call Vertex.new for each vertex entry passed" do
 				expect(mock_vertex_class).to receive(:new).exactly(vertices.length).times
 				generate_graph
@@ -33,18 +30,6 @@ describe Graph::Graph do
 					generate_graph
 				end
 			end
-
-			# it "should convert each vertex input into an Vertex instance" do
-			# 	expect(first_vertex).to_not be nil
-			# 	expect(second_vertex).to_not be nil
-			# end
-
-			# it "should correctly set coordinates" do
-			# 	expect(first_vertex.x_pos).to eq(vertices[0][1])
-			# 	expect(first_vertex.y_pos).to eq(vertices[0][2])
-			# 	expect(second_vertex.x_pos).to eq(vertices[1][1])
-			# 	expect(second_vertex.y_pos).to eq(vertices[1][2])
-			# end
 		end
 
 		describe "edges should be initialized" do
@@ -66,30 +51,6 @@ describe Graph::Graph do
 					generate_graph
 				end
 			end
-
-			# let(:first_edge) { Graph::Edge.find(edges[0][0]) }
-			# let(:second_edge) { Graph::Edge.find(edges[1][0]) }
-
-			# it "should convert each edge input into an Edge instance" do
-			# 	expect(first_edge).to_not be nil
-			# 	expect(second_edge).to_not be nil
-			# end
-
-			# it "should correctly set start vertex id" do
-				
-			# end
-
-			# it "should correctly set end vertex id" do
-
-			# end
-
-			# it "should correctly set cost of traversal" do
-
-			# end
-
-			# it "should correctly set pheromone count to 0" do
-
-			# end
 		end
 	end	
 end

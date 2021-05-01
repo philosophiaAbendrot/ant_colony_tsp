@@ -7,7 +7,7 @@ module Graph
 	class Vertex
 		extend Databaseable
 
-		attr_reader :x_pos, :y_pos, :id, :edge_ids, :outgoing_edge_ids, :incoming_edge_ids
+		attr_reader :x_pos, :y_pos, :id, :outgoing_edge_ids, :incoming_edge_ids
 
 		def initialize(x_pos:, y_pos:, id:)
 			@id = id
