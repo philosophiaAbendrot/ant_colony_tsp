@@ -14,10 +14,10 @@ module Graph
 			@trail_density = 0
 		end
 
-		def self.initialize_trail_densities
+		def self.initialize_trail_densities(set_value)
 			# set trail density to 0 for all edges
 			instances.values.each do |edge|
-				edge.trail_density = 0
+				edge.trail_density = set_value
 			end
 		end
 	end

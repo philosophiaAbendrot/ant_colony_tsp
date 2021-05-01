@@ -29,7 +29,7 @@ describe Graph::Edge do
 	describe "initialize trail densities" do
 		# set trail density to 0 for all edges
 
-		it "should set trail densities to 0 for all edges" do
+		it "should set trail densities to a set value for all edges" do
 			id = 1	
 			20.times do
 				params = { id: id, start_vertex_id: rand(30), end_vertex_id: rand(30), cost_of_traversal: 10 * rand }
@@ -37,10 +37,12 @@ describe Graph::Edge do
 				edge.trail_density = 5
 			end
 
-			Graph::Edge.initialize_trail_densities
+			set_value = 7
+
+			Graph::Edge.initialize_trail_densities(set_value)
 			trail_densities = Graph::Edge.instances.values.map(&:trail_density)
 
-			expect(trail_densities.reject { |el| el == 0 }.length).to be 0
+			expect(trail_densities.reject { |el| el == set_value }.length).to eq(0)
 		end
 	end
 end
