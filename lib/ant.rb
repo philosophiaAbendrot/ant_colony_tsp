@@ -5,13 +5,29 @@
 class Ant
 	extend Databaseable
 
-	attr_reader :visited_vertex_ids, :x_pos, :y_pos, :current_vertex_id, :visited_edge_ids
+	attr_accessor :current_vertex_id
+	attr_reader :visited_vertex_ids, :visited_edge_ids
 
-	def initialize(start_vertex:)
-		@current_vertex_id = start_vertex.id
+	def initialize(current_vertex_id:, vertex_class:, id:)
+		@id = id
+		@current_vertex_id = current_vertex_id
 		@visited_edge_ids = []
 		@visited_vertex_ids = []
-		@x_pos = start_vertex.x_pos
-		@y_pos = start_vertex.y_pos
+		@vertex_class = vertex_class
+	end
+
+	def current_vertex
+		puts "========================="
+		puts "current_vertex_id = #{@current_vertex_id}"
+		puts "@vertex_class.instances = #{@vertex_class.instances}"
+		@vertex_class.find(@current_vertex_id)
+	end
+
+	def x_pos
+		current_vertex.x_pos
+	end
+
+	def y_pos
+		current_vertex.y_pos
 	end
 end
