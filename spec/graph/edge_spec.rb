@@ -24,9 +24,23 @@ describe Graph::Edge do
 		it "should correctly set cost of traversal" do
 			expect(edge.cost_of_traversal).to eq(edge_params[:cost_of_traversal])
 		end
+	end
 
-		it "should correctly set pheromone count to 0" do
-			expect(edge.pheromone_count).to eq(0)
+	describe "initialize trail densities" do
+		# set trail density to 0 for all edges
+
+		it "should set trail densities to 0 for all edges" do
+			id = 1	
+			20.times do
+				params = { id: id, start_vertex_id: rand(30), end_vertex_id: rand(30), cost_of_traversal: 10 * rand }
+				edge = Graph::Edge.new(params)
+				edge.trail_density = 5
+			end
+
+			Graph::Edge.initialize_trail_densities
+			trail_densities = Graph::Edge.instances.values.map(&:trail_density)
+
+			expect(trail_densities.reject { |el| el == 0 }.length).to be 0
 		end
-	end	
+	end
 end
