@@ -17,9 +17,6 @@ class Ant
 	end
 
 	def current_vertex
-		puts "========================="
-		puts "current_vertex_id = #{@current_vertex_id}"
-		puts "@vertex_class.instances = #{@vertex_class.instances}"
 		@vertex_class.find(@current_vertex_id)
 	end
 
