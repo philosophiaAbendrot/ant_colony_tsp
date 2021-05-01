@@ -26,7 +26,7 @@ describe Graph::Edge do
 		end
 	end
 
-	describe "initialize trail densities" do
+	describe "initialize_trail_densities" do
 		# set trail density to 0 for all edges
 
 		it "should set trail densities to a set value for all edges" do
@@ -44,5 +44,9 @@ describe Graph::Edge do
 
 			expect(trail_densities.reject { |el| el == set_value }.length).to eq(0)
 		end
+	end
+
+	describe "initialize_delta_trail_densities" do
+		
 	end
 end
