@@ -12,7 +12,7 @@ class Ant
 		@id = id
 		@current_vertex_id = current_vertex_id
 		@visited_edge_ids = []
-		@visited_vertex_ids = []
+		@visited_vertex_ids = [current_vertex_id]
 		@vertex_class = vertex_class
 	end
 

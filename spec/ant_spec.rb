@@ -25,12 +25,12 @@ describe Ant do
 			expect(ant.current_vertex_id).to eq current_vertex_id
 		end
 
-		it "should initialize visited edge ids to a blank array" do
+		it "should initialize visited edge ids to be a blank array" do
 			expect(ant.visited_edge_ids).to eq []
 		end
 
-		it "should initialize visited vertex ids to a blank array" do
-			expect(ant.visited_vertex_ids).to eq []
+		it "should initialize visited vertex ids to an array that includes just the current_vertex_id" do
+			expect(ant.visited_vertex_ids).to eq [current_vertex_id]
 		end
 	end
 
