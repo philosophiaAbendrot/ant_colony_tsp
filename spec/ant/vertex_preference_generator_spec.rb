@@ -30,7 +30,9 @@ describe Ant::VertexPreferenceGenerator do
 		Graph::Edge.destroy_all
 	end
 
-	context "when none of the vertices have been visited" do
+	context "when none of the vertices have been visited (except the current vertex)" do
+		let(:visited) { [1] }
+
 		it "should provide a mapping of vertex ids to preference value" do
 			edge_1 = Graph::Edge.find(1)
 			tau_1_3 = edge_1.trail_density
@@ -48,7 +50,28 @@ describe Ant::VertexPreferenceGenerator do
 
 			expected_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
 
-			result = Ant::VertexPreferenceGenerator.execute(current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited: visited, current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
+			expect(result).to eq(expected_result)
+		end
+	end
+
+	context "when some vertices have been visited" do
+		let(:visited) { [1, 3] }
+
+		it "should provided a mapping of vertex ids to preference value" do
+			edge_2 = Graph::Edge.find(2)
+			tau_1_4 = edge_2.trail_density
+			eta_1_4 = edge_1.cost_of_traversal
+
+			edge_3 = Graph::Edge.find(3)
+			tau_1_2 = edge_3.trail_density
+			eta_1_2 = edge_3.cost_of_traversal
+
+			sum = tau_1_4 * eta_1_4 + tau_1_2 * eta_1_2
+
+			expected_result = { edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+
+			result = Ant::VertexPreferenceGenerator.execute(visited: visited, current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
 			expect(result).to eq(expected_result)
 		end
 	end
