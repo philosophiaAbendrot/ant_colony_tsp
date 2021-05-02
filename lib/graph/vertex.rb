@@ -11,8 +11,8 @@ module Graph
 
 		def initialize(x_pos:, y_pos:, id:)
 			@id = id
-			@x_pos = x_pos
-			@y_pos = y_pos
+			@x_pos = x_pos.to_f
+			@y_pos = y_pos.to_f
 			@outgoing_edge_ids = []
 			@incoming_edge_ids = []
 		end

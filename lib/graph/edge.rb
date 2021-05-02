@@ -8,24 +8,24 @@ module Graph
 
 		def initialize(id: , cost_of_traversal:, start_vertex_id:, end_vertex_id:)		
 			@id = id
-			@cost_of_traversal = cost_of_traversal
+			@cost_of_traversal = cost_of_traversal.to_f
 			@start_vertex_id = start_vertex_id
 			@end_vertex_id = end_vertex_id
-			@trail_density = 0
-			@delta_trail_density = 0
+			@trail_density = 0.0
+			@delta_trail_density = 0.0
 		end
 
 		def self.set_trail_densities(set_value)
 			# set trail density to a set value for all edges
 			all.each do |edge|
-				edge.trail_density = set_value
+				edge.trail_density = set_value.to_f
 			end
 		end
 
 		def self.initialize_delta_trail_densities
 			# trail delta trail density to 0 for all edges
 			all.each do |edge|
-				edge.delta_trail_density = 0
+				edge.delta_trail_density = 0.0
 			end
 		end
 	end
