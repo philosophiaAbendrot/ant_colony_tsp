@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Ant do
+describe Ant::Ant do
 	let(:current_vertex_id) { 5 }
 	let!(:current_vertex) { Graph::Vertex.new(x_pos: -5, y_pos: 3, id: current_vertex_id) }
 	let(:ant_id) { 1 }
 	let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id } }
-	let(:ant) { Ant.find(ant_id) }
+	let(:ant) { Ant::Ant.find(ant_id) }
 
 	before(:each) do
-		Ant.new(initialize_params)
+		Ant::Ant.new(initialize_params)
 	end
 
 	after(:each) do
-		Ant.destroy_all
+		Ant::Ant.destroy_all
 		Graph::Vertex.destroy_all
 	end
 
@@ -50,5 +50,8 @@ describe Ant do
 		it "should return the y_pos of the current_vertex" do
 			expect(ant.y_pos).to eq current_vertex.y_pos
 		end
+	end
+
+	describe "move_to_next_city" do
 	end
 end

@@ -4,7 +4,7 @@ describe AntColonyTsp do
 	let(:edge_params) { [[1, 3, 4, 5.0], [2, 4, 3, 3.0]] }
 	let(:vertex_params) { [[3, 4.0, 5.0], [4, 5.0, 6.0]] }
 	let(:mock_graph_class) { class_double("Graph::Graph") }
-	let(:mock_ant_class) { class_double("Ant") }
+	let(:mock_ant_class) { class_double("Ant::Ant") }
 	let(:rand_gen_double) { double("rand_gen", rand_int: 5) }
 	let(:num_ants) { AntColonyTsp::DEFAULT_NUM_ANTS }
 	let(:num_iterations) { AntColonyTsp::DEFAULT_NUM_ITERATIONS }
@@ -40,7 +40,7 @@ describe AntColonyTsp do
 
 		describe "testing initialization of ant class" do
 			# replace mock ant class with real class
-			let(:ant) { Ant.all.first }
+			let(:ant) { Ant::Ant.all.first }
 
 			before(:each) do
 				allow(mock_graph_class).to receive(:new)

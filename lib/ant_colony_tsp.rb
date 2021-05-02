@@ -1,5 +1,6 @@
 require "modules/databaseable"
-require "ant"
+require "ant/ant"
+require "ant/vertex_preference_generator"
 require "graph/graph"
 require "graph/edge"
 require "graph/vertex"
