@@ -10,6 +10,8 @@ class AntColonyTsp
 	attr_reader :time
 	DEFAULT_NUM_ANTS = 20
 	DEFAULT_NUM_ITERATIONS = 100
+	ALPHA_VALUE = 1
+	BETA_VALUE = 1
 
 	def initialize(edges:, vertices:, graph_class:, vertex_class:, edge_class:, ant_class:, rand_gen:, num_iterations:, num_ants:)
 		@ant_class = ant_class
