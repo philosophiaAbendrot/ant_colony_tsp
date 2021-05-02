@@ -9,7 +9,7 @@ describe AntColonyTsp do
 
 	describe "initialize" do
 		before(:each) do
-			allow(mock_ant_class).to receive(:all).and_return([])
+			allow(mock_ant_class).to receive(:all).and_return(Array.new(AntColonyTsp::NUM_ANTS) { double("ant_element", id: 5) })
 		end
 
 		def initialize_ant_colony_tsp
@@ -49,6 +49,21 @@ describe AntColonyTsp do
 
 			it "should call initialize on provided Ant class AntColonyTsp::NUM_ANTS times" do
 				expect(mock_ant_class).to receive(:new).exactly(AntColonyTsp::NUM_ANTS).times
+				initialize_ant_colony_tsp
+			end
+		end
+
+		describe "testing placement of ant instances" do
+			let(:rand_gen_double) { class_double("Utils::RandGen") }
+
+			before(:each) do
+				allow(rand_gen_double).to receive(:rand_int).and_return(AntColonyTsp::NUM_ANTS - 1)
+				allow(mock_graph_class).to receive(:new)
+				allow(mock_ant_class).to receive(:new)
+			end
+
+			it "should call rand_int on Utils::RandGen class with the number of ants currently existing" do
+				expect(rand_gen_double).to receive(:rand_int).with(AntColonyTsp::NUM_ANTS)
 				initialize_ant_colony_tsp
 			end
 		end
