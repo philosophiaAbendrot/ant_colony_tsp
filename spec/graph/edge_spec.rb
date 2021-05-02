@@ -38,7 +38,7 @@ describe Graph::Edge do
 			set_value = 7
 
 			Graph::Edge.set_trail_densities(set_value)
-			trail_densities = Graph::Edge.instances.values.map(&:trail_density)
+			trail_densities = Graph::Edge.all.map(&:trail_density)
 
 			expect(trail_densities.reject { |el| el == set_value }.length).to eq(0)
 		end
@@ -56,7 +56,7 @@ describe Graph::Edge do
 			end
 
 			Graph::Edge.initialize_delta_trail_densities
-			trail_densities = Graph::Edge.instances.values.map(&:delta_trail_density)
+			trail_densities = Graph::Edge.all.map(&:delta_trail_density)
 			expect(trail_densities.reject { |el| el == 0 }.length).to eq(0)
 		end
 	end

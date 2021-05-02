@@ -30,8 +30,20 @@ describe Databaseable do
 				expect(ChildClass.find(instance_id)).to eq(child_class_instance)
 			end
 
-			it "ChildClass.instances should have one element" do
-				expect(ChildClass.instances.length).to be 1
+			it "ChildClass.all should have one element" do
+				expect(ChildClass.all.length).to eq 1
+			end
+
+			it "ChildClass.all should include the child class instance" do
+				expect(ChildClass.all.first).to eq(child_class_instance)
+			end
+
+			it "ChildClass.id_mapping should map the id of the child class to the child class instance" do
+				expect(ChildClass.id_mapping[child_class_instance.id]).to eq(child_class_instance)
+			end
+
+			it "ChildClass.id_mapping should have size 1" do
+				expect(ChildClass.id_mapping.length).to eq 1
 			end
 		end
 	end
@@ -50,8 +62,8 @@ describe Databaseable do
 				expect(ChildClass.find(instance_id)).to eq(child_class_instance)
 			end
 
-			it "ChildClass.instances should have one element" do
-				expect(ChildClass.instances.length).to be 1
+			it "ChildClass.all should have one element" do
+				expect(ChildClass.all.length).to be 1
 			end
 
 			it "calling find SecondChildClass with the model's id should return nil" do
@@ -59,7 +71,11 @@ describe Databaseable do
 			end
 
 			it "SecondChildClass.instances should have zero elements" do
-				expect(SecondChildClass.instances.length).to be 0
+				expect(SecondChildClass.all.length).to be 0
+			end
+
+			it "SecondChildClass.id_mapping should have zero elements" do
+				expect(SecondChildClass.id_mapping.empty?).to be true
 			end
 		end
 	end

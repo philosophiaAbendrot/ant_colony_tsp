@@ -34,8 +34,8 @@ module Graph
 				end
 			end
 
-			@vertices = Vertex.instances
-			@edges = Edge.instances
+			@vertices = Vertex.all
+			@edges = Edge.all
 		end
 	end
 end

@@ -14,6 +14,7 @@ class AntColonyTsp
 		@graph_class = graph_class
 		@vertex_class = vertex_class
 		@edge_class = edge_class
+		@rand_gen = rand_gen
 
 		@time = 0
 		# initialize graph
@@ -22,13 +23,14 @@ class AntColonyTsp
 		ant_id = 1
 
 		NUM_ANTS.times do
-			@ant_class.new(current_vertex_id: rand_gen.rand_int(@vertex_class.instances.length), vertex_class: @vertex_class, id: ant_id)
+			rand_num = @rand_gen.rand_int(@ant_class.all.length)
+			@ant_class.new(current_vertex_id: rand_num, vertex_class: @vertex_class, id: ant_id)
 			ant_id += 1
 		end
 	end
 
 	def self.execute(edges:, vertices:, graph_class: Graph::Graph, vertex_class: Graph::Vertex, edge_class: Graph::Edge, ant_class: Ant, rand_gen: Utils::RandGen)
-		main_instance = new(edges: edges,
+		@main_instance = new(edges: edges,
 							vertices: vertices,
 							graph_class: graph_class,
 							vertex_class: vertex_class,

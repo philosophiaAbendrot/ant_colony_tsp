@@ -17,14 +17,14 @@ module Graph
 
 		def self.set_trail_densities(set_value)
 			# set trail density to a set value for all edges
-			instances.values.each do |edge|
+			all.each do |edge|
 				edge.trail_density = set_value
 			end
 		end
 
 		def self.initialize_delta_trail_densities
 			# trail delta trail density to 0 for all edges
-			instances.values.each do |edge|
+			all.each do |edge|
 				edge.delta_trail_density = 0
 			end
 		end

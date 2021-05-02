@@ -11,8 +11,12 @@ module Databaseable
 		@instances[id]
 	end
 
-	def instances
+	def id_mapping
 		@instances || {}
+	end
+
+	def all
+		@instances ? @instances.values : []
 	end
 
 	def new(*arguments, &block)

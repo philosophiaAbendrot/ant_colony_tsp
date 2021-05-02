@@ -8,6 +8,10 @@ describe AntColonyTsp do
 	let(:rand_gen_double) { double("rand_gen", rand_int: 5) }
 
 	describe "initialize" do
+		before(:each) do
+			allow(mock_ant_class).to receive(:all).and_return([])
+		end
+
 		def initialize_ant_colony_tsp
 			AntColonyTsp.new(edges: edge_params,
 							vertices: vertex_params,
@@ -18,31 +22,34 @@ describe AntColonyTsp do
 							rand_gen: rand_gen_double)
 		end
 
-		before(:each) do
-			allow(mock_ant_class).to receive(:instances).and_return([])
-		end
+		describe "testing initialization of graph" do
+			before(:each) do
+				allow(mock_ant_class).to receive(:new)
+			end
 
-		it "should call initialize on provided Graph class with the correct parameters" do
-			allow(mock_ant_class).to receive(:new)
-			expect(mock_graph_class).to receive(:new).with(hash_including(edges: edge_params, vertices: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge))
-			initialize_ant_colony_tsp
-		end
-
-		it "should call initialize on provided Ant class AntColonyTsp::NUM_ANTS times" do
-			allow(mock_graph_class).to receive(:new)
-			expect(mock_ant_class).to receive(:new).exactly(AntColonyTsp::NUM_ANTS).times
-			initialize_ant_colony_tsp
+			it "should call initialize on provided Graph class with the correct parameters" do
+				allow(mock_ant_class).to receive(:new)
+				expect(mock_graph_class).to receive(:new).with(hash_including(edges: edge_params, vertices: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge))
+				initialize_ant_colony_tsp
+			end
 		end
 
 		describe "testing initialization of ant class" do
 			# replace mock ant class with real class
-			let(:mock_ant_class) { Ant }
+			let(:ant) { Ant.all.first }
 
-			it "should call initialize on provided Ant class with current_vertex set to the value provided by Utils::RandGen class" do
+			before(:each) do
 				allow(mock_graph_class).to receive(:new)
+			end
+
+			it "should call initialize on provided Ant class with the correct parameters" do
+				expect(mock_ant_class).to receive(:new).exactly(AntColonyTsp::NUM_ANTS).times.with(hash_including(current_vertex_id: rand_gen_double.rand_int, vertex_class: Graph::Vertex))
 				initialize_ant_colony_tsp
-				puts "Ant.instances = #{Ant.instances}"
-				expect(Ant.instances[0].current_vertex_id).to eq(rand_gen_double.rand_int)
+			end
+
+			it "should call initialize on provided Ant class AntColonyTsp::NUM_ANTS times" do
+				expect(mock_ant_class).to receive(:new).exactly(AntColonyTsp::NUM_ANTS).times
+				initialize_ant_colony_tsp
 			end
 		end
 	end
