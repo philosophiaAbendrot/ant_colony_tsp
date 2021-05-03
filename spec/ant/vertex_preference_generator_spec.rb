@@ -7,19 +7,6 @@ describe Ant::VertexPreferenceGenerator do
 	let(:edge_inputs) { [[1, 4.6, 1, 3], [2, 9.5, 1, 4], [3, 7.3, 1, 2]] }
 	let(:default_pheromone_density) { 3 }
 
-	def generate_vertices
-		vertex_inputs.each do |input|
-			Graph::Vertex.new(id: input[0], x_pos: input[1], y_pos: input[2])
-		end
-	end
-
-	def generate_edges
-		edge_inputs.each do |input|
-			edge = Graph::Edge.new(id: input[0], cost_of_traversal: input[1], start_vertex_id: input[2], end_vertex_id: input[3])
-			edge.trail_density = default_pheromone_density
-		end
-	end
-
 	before(:each) do
 		generate_vertices
 		generate_edges
@@ -48,10 +35,20 @@ describe Ant::VertexPreferenceGenerator do
 
 			sum = (tau_1_3 * eta_1_3 + tau_1_4 * eta_1_4 + tau_1_2 * eta_1_2).to_f
 
-			expected_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+			hashed_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+			cumulative_probability_mapping = []
+			cumulative_prob = 0
+			cumulative_prob += hashed_result[edge_1.end_vertex_id]
+			cumulative_probability_mapping << [edge_1.end_vertex_id, cumulative_prob]
+
+			cumulative_prob += hashed_result[edge_2.end_vertex_id]
+			cumulative_probability_mapping << [edge_2.end_vertex_id, cumulative_prob]
+
+			cumulative_prob += hashed_result[edge_3.end_vertex_id]
+			cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
 			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
-			expect(result).to eq(expected_result)
+			expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
 		end
 	end
 
@@ -71,19 +68,65 @@ describe Ant::VertexPreferenceGenerator do
 
 			sum = (product_1_4 + product_1_2).to_f
 
-			expected_result = { edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+			hashed_result = { edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+			cumulative_probability_mapping = []
+			cumulative_prob = 0
+
+			cumulative_prob += hashed_result[edge_2.end_vertex_id]
+			cumulative_probability_mapping << [edge_2.end_vertex_id, cumulative_prob]
+
+			cumulative_prob += hashed_result[edge_3.end_vertex_id]
+			cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
 			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
-			expect(result).to eq(expected_result)
+			expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
 		end
 	end
 
 	context "when all vertices have been visited" do
 		let(:visited) { [1, 2, 3, 4] }
 
-		it "should return an empty hash" do
+		it "should return an empty array" do
 			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
-			expect(result).to eq({})
+			expect(result).to eq([])
 		end
+	end
+
+	private
+
+	def generate_vertices
+		vertex_inputs.each do |input|
+			Graph::Vertex.new(id: input[0], x_pos: input[1], y_pos: input[2])
+		end
+	end
+
+	def generate_edges
+		edge_inputs.each do |input|
+			edge = Graph::Edge.new(id: input[0], cost_of_traversal: input[1], start_vertex_id: input[2], end_vertex_id: input[3])
+			edge.trail_density = default_pheromone_density
+		end
+	end
+
+	def compare_array_of_floats(arr1, arr2)
+		return false if arr1.length != arr2.length
+
+		for i in 0..arr1.length - 1
+			sub_arr1 = arr1[i]
+			sub_arr2 = arr2[i]
+
+			return false unless sub_arr1.length == sub_arr2.length
+
+			return false unless compare_floats(arr1[i][0], arr2[i][0]) && compare_floats(arr1[i][1], arr2[i][1])
+		end
+
+		true
+	end
+
+	def compare_floats(float1, float2)
+		# if percent difference is < 0.1%, pass
+		diff = (float1 - float2).abs
+		average = (float1 + float2) / 2.0
+		percent_diff = diff / average * 100
+		percent_diff < 0.1
 	end
 end

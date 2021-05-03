@@ -3,28 +3,19 @@ module Ant
 		def self.execute(outgoing_edges:, visited:)
 			prospective_edges = outgoing_edges.select { |edge| !visited.include?(edge.end_vertex_id) }
 			sum_products = 0
-			preference_mapping = {}
+			preference_mapping = []
 
 			prospective_edges.each do |edge|
 				product = (edge.trail_density)**AntColonyTsp::ALPHA_VALUE * (1 / edge.cost_of_traversal)**AntColonyTsp::BETA_VALUE
 				sum_products += product
-				preference_mapping[edge.end_vertex_id] = product
+				# store end vertex id and cumulative probability
+				preference_mapping << [edge.end_vertex_id, sum_products]
 			end
 
-			normalized_preference_mapping = {}
+			# normalize the mapping
+			normalized_preference_mapping = preference_mapping.map { |el| [el[0], el[1] / sum_products]  }
 
-			preference_mapping.each do |k, v|
-				normalized_preference_mapping[k] = v / sum_products
-			end
-
-			# logic in progress
-			preferences = preferences.to_a.sort_by { |el| el[1] }
-			cumulative_probability = 0
-
-			preferences.each do |pref|
-				cumulative_probability += pref[1]
-				cumulative_preferences << [pref[0], cumulative_probability]
-			end
+			normalized_preference_mapping
 		end
 	end
 end
