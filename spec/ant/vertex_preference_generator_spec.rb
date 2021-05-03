@@ -50,7 +50,7 @@ describe Ant::VertexPreferenceGenerator do
 
 			expected_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
 
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
 			expect(result).to eq(expected_result)
 		end
 	end
@@ -73,7 +73,7 @@ describe Ant::VertexPreferenceGenerator do
 
 			expected_result = { edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
 
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
 			expect(result).to eq(expected_result)
 		end
 	end
@@ -82,7 +82,7 @@ describe Ant::VertexPreferenceGenerator do
 		let(:visited) { [1, 2, 3, 4] }
 
 		it "should return an empty hash" do
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, current_vertex: Graph::Vertex.find(1), outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
 			expect(result).to eq({})
 		end
 	end

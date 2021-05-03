@@ -1,6 +1,6 @@
 module Ant
 	class VertexPreferenceGenerator
-		def self.execute(current_vertex:, outgoing_edges:, visited:)
+		def self.execute(outgoing_edges:, visited:)
 			prospective_edges = outgoing_edges.select { |edge| !visited.include?(edge.end_vertex_id) }
 			sum_products = 0
 			preference_mapping = {}
@@ -17,7 +17,14 @@ module Ant
 				normalized_preference_mapping[k] = v / sum_products
 			end
 
-			normalized_preference_mapping
+			# logic in progress
+			preferences = preferences.to_a.sort_by { |el| el[1] }
+			cumulative_probability = 0
+
+			preferences.each do |pref|
+				cumulative_probability += pref[1]
+				cumulative_preferences << [pref[0], cumulative_probability]
+			end
 		end
 	end
 end
