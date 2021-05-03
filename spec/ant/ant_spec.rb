@@ -4,7 +4,7 @@ describe Ant::Ant do
 	let(:current_vertex_id) { 5 }
 	let!(:current_vertex) { Graph::Vertex.new(x_pos: -5, y_pos: 3, id: current_vertex_id) }
 	let(:ant_id) { 1 }
-	let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id } }
+	let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, edge_class: Graph::Edge, id: ant_id } }
 	let(:ant) { Ant::Ant.find(ant_id) }
 
 	before(:each) do
@@ -53,5 +53,9 @@ describe Ant::Ant do
 	end
 
 	describe "move_to_next_city" do
+		let(:mock_rand_gen) { double("rand_gen", rand_float, 0.5) }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: Graph::Edge, rand_gen: mock_rand_gen } }
+
+		
 	end
 end
