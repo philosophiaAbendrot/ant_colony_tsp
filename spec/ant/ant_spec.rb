@@ -67,6 +67,11 @@ describe Ant::Ant do
 		before(:each) do
 			generate_vertices(vertex_inputs)
 			generate_edges(edge_inputs, default_pheromone_density)
+
+			# set up connections on the vertex the ant is on
+			vertex_1 = Graph::Vertex.find(1)
+			vertex_1.outgoing_edge_ids = [1, 2, 3]
+
 			ant.current_vertex_id = 1
 			ant.visited_vertex_ids = [1]
 			ant.move_to_next_vertex

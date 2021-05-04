@@ -20,7 +20,7 @@ describe Ant::VertexPreferenceGenerator do
 	end
 
 	context "when none of the vertices have been visited (except the current vertex)" do
-		let(:visited) { [1] }
+		let(:visited_vertex_ids) { [1] }
 
 		it "should provide a mapping of vertex ids to preference value" do
 			edge_1 = Graph::Edge.find(1)
@@ -49,13 +49,13 @@ describe Ant::VertexPreferenceGenerator do
 			cumulative_prob += hashed_result[edge_3.end_vertex_id]
 			cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids, outgoing_edges: Graph::Edge.all)
 			expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
 		end
 	end
 
 	context "when some vertices have been visited" do
-		let(:visited) { [1, 3] }
+		let(:visited_vertex_ids) { [1, 3] }
 
 		it "should provided a mapping of vertex ids to preference value" do
 			edge_2 = Graph::Edge.find(2)
@@ -80,16 +80,16 @@ describe Ant::VertexPreferenceGenerator do
 			cumulative_prob += hashed_result[edge_3.end_vertex_id]
 			cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids, outgoing_edges: Graph::Edge.all)
 			expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
 		end
 	end
 
 	context "when all vertices have been visited" do
-		let(:visited) { [1, 2, 3, 4] }
+		let(:visited_vertex_ids) { [1, 2, 3, 4] }
 
 		it "should return an empty array" do
-			result = Ant::VertexPreferenceGenerator.execute(visited: visited, outgoing_edges: Graph::Edge.all)
+			result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids, outgoing_edges: Graph::Edge.all)
 			expect(result).to eq([])
 		end
 	end

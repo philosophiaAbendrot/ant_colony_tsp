@@ -1,7 +1,7 @@
 module Ant
 	class VertexPreferenceGenerator
-		def self.execute(outgoing_edges:, visited:)
-			prospective_edges = outgoing_edges.select { |edge| !visited.include?(edge.end_vertex_id) }
+		def self.execute(outgoing_edges:, visited_vertex_ids:)
+			prospective_edges = outgoing_edges.select { |edge| !visited_vertex_ids.include?(edge.end_vertex_id) }
 			sum_products = 0
 			preference_mapping = []
 

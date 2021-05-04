@@ -27,6 +27,31 @@ module Ant
 		end
 
 		def move_to_next_vertex
+			# evaluate preferences
+
+			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @edge_class.find(edge_id) }
+			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges, visited_vertex_ids: @visited_vertex_ids.dup)
+			rand_num = @rand_gen.rand_float
+
+			selected_vertex_id = nil
+
+			for i in 0..cumulative_preferences.length - 1
+				vertex_id, cumulative_probability = cumulative_preferences[i]
+
+				if cumulative_probability >= rand_num
+					selected_vertex_id = vertex_id
+					break
+				end
+			end
+
+			selected_edge_id = outgoing_edges.select { |edge| edge.end_vertex_id == selected_vertex_id }.first.id
+
+			# move to new vertex
+			@current_vertex_id = selected_vertex_id
+			@visited_vertex_ids << selected_vertex_id
+			@visited_edge_ids << selected_edge_id
+
+			nil
 		end
 	end
 end
