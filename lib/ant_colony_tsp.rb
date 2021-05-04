@@ -49,8 +49,8 @@ class AntColonyTsp
 
 	private
 
-	def initialize_graph(edges, vertices)
-		@graph = @graph_class.new(edges: edges, vertices: vertices, vertex_class: @vertex_class, edge_class: @edge_class)
+	def initialize_graph(edges_input, vertices_input)
+		@graph = @graph_class.new(edges_input: edges_input, vertices_input: vertices_input, vertex_class: @vertex_class, edge_class: @edge_class)
 	end
 
 	def initialize_ants

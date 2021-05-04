@@ -33,7 +33,7 @@ describe AntColonyTsp do
 
 			it "should call initialize on provided Graph class with the correct parameters" do
 				allow(mock_ant_class).to receive(:new)
-				expect(mock_graph_class).to receive(:new).with(hash_including(edges: edge_params, vertices: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge))
+				expect(mock_graph_class).to receive(:new).with(hash_including(edges_input: edge_params, vertices_input: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge))
 				initialize_ant_colony_tsp
 			end
 		end
