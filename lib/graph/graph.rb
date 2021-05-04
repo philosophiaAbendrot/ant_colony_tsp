@@ -1,7 +1,5 @@
 module Graph
 	class Graph
-		attr_reader :edges, :vertices
-
 		def initialize(edges_input:, vertices_input:, vertex_class:, edge_class:)
 			@vertex_class = vertex_class
 			@edge_class = edge_class
@@ -9,9 +7,7 @@ module Graph
 			# initialize edges and Vertices
 			initialize_edges(edges_input)
 			initialize_vertices(vertices_input)
-
-			@vertices = Vertex.all
-			@edges = Edge.all
+			populate_incoming_and_outgoing_edges_on_vertices
 		end
 
 		private 
@@ -24,7 +20,7 @@ module Graph
 
 			edges_input.each do |edge|
 				if edge.is_a?(Array) && edge[0].is_a?(Integer) && edge[1].is_a?(Integer) && edge[2].is_a?(Integer) && edge[3].is_a?(Float)
-					@edge_class.new(id: edge[0], start_vertex_id: edge[1], end_vertex_id: edge[2], cost_of_traversal: edge[3])
+					@edge_class.new(id: edge[0], start_vertex_id: edge[1], end_vertex_id: edge[2], cost_of_traversal: edge[3], vertex_class: @vertex_class)
 				else
 					raise ArgumentError.new("Invalid input for edges entry")
 				end
@@ -46,12 +42,11 @@ module Graph
 			end
 		end
 
-		def populate_incoming_edges_on_vertices
-
-		end
-
-		def populate_outgoing_edges_on_vertices
-
+		def populate_incoming_and_outgoing_edges_on_vertices
+			@edge_class.all.each do |edge|
+				edge.start_vertex.outgoing_edge_ids << edge.id
+				edge.end_vertex.incoming_edge_ids << edge.id
+			end
 		end
 	end
 end

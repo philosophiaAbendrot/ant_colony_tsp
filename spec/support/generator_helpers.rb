@@ -9,7 +9,7 @@ module GeneratorHelpers
 
 	def generate_edges(edge_inputs, default_pheromone_density)
 		edge_inputs.each do |input|
-			edge = Graph::Edge.new(id: input[0], cost_of_traversal: input[1], start_vertex_id: input[2], end_vertex_id: input[3])
+			edge = Graph::Edge.new(id: input[0], cost_of_traversal: input[1], start_vertex_id: input[2], end_vertex_id: input[3], vertex_class: Graph::Vertex)
 			edge.trail_density = default_pheromone_density
 		end
 	end
