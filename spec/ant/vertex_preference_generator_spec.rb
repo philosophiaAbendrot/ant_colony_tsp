@@ -1,6 +1,8 @@
 require "spec_helper"
 
 describe Ant::VertexPreferenceGenerator do
+	include GeneratorHelpers
+
 	# vertices input format: [id, x_pos, y_pos]
 	let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6], [4, 9.5, 5]] }
 	# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
@@ -8,8 +10,8 @@ describe Ant::VertexPreferenceGenerator do
 	let(:default_pheromone_density) { 3 }
 
 	before(:each) do
-		generate_vertices
-		generate_edges
+		generate_vertices(vertex_inputs)
+		generate_edges(edge_inputs, default_pheromone_density)
 	end
 
 	after(:each) do
@@ -93,19 +95,6 @@ describe Ant::VertexPreferenceGenerator do
 	end
 
 	private
-
-	def generate_vertices
-		vertex_inputs.each do |input|
-			Graph::Vertex.new(id: input[0], x_pos: input[1], y_pos: input[2])
-		end
-	end
-
-	def generate_edges
-		edge_inputs.each do |input|
-			edge = Graph::Edge.new(id: input[0], cost_of_traversal: input[1], start_vertex_id: input[2], end_vertex_id: input[3])
-			edge.trail_density = default_pheromone_density
-		end
-	end
 
 	def compare_array_of_floats(arr1, arr2)
 		return false if arr1.length != arr2.length
