@@ -74,45 +74,68 @@ describe Ant::Ant do
 
 			ant.current_vertex_id = 1
 			ant.visited_vertex_ids = [1]
-			ant.move_to_next_vertex
 		end
 
 		it "should move to the correct vertex" do
-			edge_1 = Graph::Edge.find(1)
-			tau_1_3 = (edge_1.trail_density)**AntColonyTsp::ALPHA_VALUE
-			eta_1_3 = (1 / edge_1.cost_of_traversal)**AntColonyTsp::BETA_VALUE
+			ant.move_to_next_vertex
 
-			edge_2 = Graph::Edge.find(2)
-			tau_1_4 = (edge_2.trail_density)**AntColonyTsp::ALPHA_VALUE
-			eta_1_4 = (1 / edge_2.cost_of_traversal)**AntColonyTsp::BETA_VALUE
+			# calculate what answer should be
+			# edge_1 = Graph::Edge.find(1)
+			# tau_1_3 = (edge_1.trail_density)**AntColonyTsp::ALPHA_VALUE
+			# eta_1_3 = (1 / edge_1.cost_of_traversal)**AntColonyTsp::BETA_VALUE
 
-			edge_3 = Graph::Edge.find(3)
-			tau_1_2 = (edge_3.trail_density)**AntColonyTsp::ALPHA_VALUE
-			eta_1_2 = (1 / edge_3.cost_of_traversal)**AntColonyTsp::BETA_VALUE
+			# edge_2 = Graph::Edge.find(2)
+			# tau_1_4 = (edge_2.trail_density)**AntColonyTsp::ALPHA_VALUE
+			# eta_1_4 = (1 / edge_2.cost_of_traversal)**AntColonyTsp::BETA_VALUE
 
-			sum = (tau_1_3 * eta_1_3 + tau_1_4 * eta_1_4 + tau_1_2 * eta_1_2).to_f
+			# edge_3 = Graph::Edge.find(3)
+			# tau_1_2 = (edge_3.trail_density)**AntColonyTsp::ALPHA_VALUE
+			# eta_1_2 = (1 / edge_3.cost_of_traversal)**AntColonyTsp::BETA_VALUE
 
-			hashed_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
-			cumulative_probability_mapping = []
-			cumulative_prob = 0
-			cumulative_prob += hashed_result[edge_1.end_vertex_id]
-			cumulative_probability_mapping << [edge_1.end_vertex_id, cumulative_prob]
+			# sum = (tau_1_3 * eta_1_3 + tau_1_4 * eta_1_4 + tau_1_2 * eta_1_2).to_f
 
-			cumulative_prob += hashed_result[edge_2.end_vertex_id]
-			cumulative_probability_mapping << [edge_2.end_vertex_id, cumulative_prob]
+			# hashed_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+			# cumulative_probability_mapping = []
+			# cumulative_prob = 0
+			# cumulative_prob += hashed_result[edge_1.end_vertex_id]
+			# cumulative_probability_mapping << [edge_1.end_vertex_id, cumulative_prob]
 
-			cumulative_prob += hashed_result[edge_3.end_vertex_id]
-			cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
+			# cumulative_prob += hashed_result[edge_2.end_vertex_id]
+			# cumulative_probability_mapping << [edge_2.end_vertex_id, cumulative_prob]
+
+			# cumulative_prob += hashed_result[edge_3.end_vertex_id]
+			# cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
 			expect(ant.current_vertex_id).to eq(4)
 		end
 
+		it "should return true to indicate that the ant moved successfully" do
+			expect(ant.move_to_next_vertex).to be true
+		end
+
 		it "should have '4' in its list of visited vertices" do
+			ant.move_to_next_vertex
 			expect(ant.visited_vertex_ids.include?(4)).to be true
 		end
 
 		it "should have '2' in its list of visited edges" do
+			ant.move_to_next_vertex
 			expect(ant.visited_edge_ids.include?(2)).to be true
+		end
+
+		context "if there is no connected vertex which has not been visited" do
+			before(:each) do
+				ant.visited_vertex_ids = [2, 3, 4]
+			end
+
+			it "ant should not move" do
+				ant.move_to_next_vertex
+				expect(ant.current_vertex_id).to eq(1)
+			end
+
+			it "should return false to indicate that ant did not move" do
+				expect(ant.move_to_next_vertex).to be false
+			end
 		end
 	end
 end
