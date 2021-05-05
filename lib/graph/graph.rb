@@ -18,11 +18,13 @@ module Graph
 
 			raise ArgumentError.new("Edges input is not an array") unless edges_input.is_a?(Array)
 
-			edges_input.each do |edge|
-				if edge.is_a?(Array) && edge[0].is_a?(Integer) && edge[1].is_a?(Integer) && edge[2].is_a?(Integer) && edge[3].is_a?(Float)
-					@edge_class.new(id: edge[0], start_vertex_id: edge[1], end_vertex_id: edge[2], cost_of_traversal: edge[3], vertex_class: @vertex_class)
+			edges_input.each do |edge_input|
+				edge_input.merge!(vertex_class: @vertex_class)
+
+				if edge_input.is_a?(Hash)
+					@edge_class.new(edge_input)
 				else
-					raise ArgumentError.new("Invalid input for edges entry")
+					raise ArgumentError.new("Edge input is not in hash format")
 				end
 			end
 		end
@@ -33,11 +35,11 @@ module Graph
 
 			raise ArgumentError.new("Vertices input is not an array") unless vertices_input.is_a?(Array)
 
-			vertices_input.each do |vertex|
-				if vertex.is_a?(Array) && vertex[0].is_a?(Integer) && vertex[1].is_a?(Float) && vertex[2].is_a?(Float)
-					@vertex_class.new(id: vertex[0], x_pos: vertex[1], y_pos: vertex[2])
+			vertices_input.each do |vertex_input|
+				if vertex_input.is_a?(Hash)
+					@vertex_class.new(vertex_input)
 				else
-					raise ArgumentError.new("Invalid input for vertex entry")
+					raise ArgumentError.new("Vertex input is not in hash format")
 				end
 			end
 		end

@@ -1,8 +1,9 @@
 require "spec_helper"
 
 describe AntColonyTsp do
-	let(:edge_params) { [[1, 3, 4, 5.0], [2, 4, 3, 3.0]] }
-	let(:vertex_params) { [[3, 4.0, 5.0], [4, 5.0, 6.0]] }
+	let(:edge_params) { [{ id: 1, start_vertex_id: 3, end_vertex_id: 4, cost_of_traversal: 5 },
+											 { id: 2, start_vertex_id: 4, end_vertex_id: 3, cost_of_traversal: 3 }] }
+	let(:vertex_params) { [{ id: 3, x_pos: 4, y_pos: 5 }, { id: 4, x_pos: 5.0, y_pos: 6.0 }] }
 	let(:mock_graph_class) { class_double("Graph::Graph") }
 	let(:mock_ant_class) { class_double("Ant::Ant") }
 	let(:rand_gen_double) { double("rand_gen", rand_int: 5) }
