@@ -21,10 +21,13 @@ class AntColonyTsp
 		@rand_gen = rand_gen
 		@num_ants = num_ants
 		@num_iterations = num_iterations
+		@num_vertices = vertices.length
 
 		@time = 0
 
+		# initialize graph
 		initialize_graph(edges, vertices)
+		# initialize ants and place them on random vertices
 		initialize_ants
 	end
 
@@ -45,6 +48,13 @@ class AntColonyTsp
 							rand_gen: rand_gen,
 							num_ants: num_ants,
 							num_iterations: num_iterations)
+
+		@ant_class.all.each do |ant|
+			# make every ant execute one tour
+			for i in 0..@num_vertices - 2
+				break unless ant.move_to_next_vertex
+			end
+		end
 	end
 
 	private
