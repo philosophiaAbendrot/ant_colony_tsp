@@ -17,9 +17,12 @@ class TestInputGenerator
 
 	def execute
 		vertex_outputs = generate_vertex_inputs
+		@adj_mat = initialize_adjacency_matrix(vertex_outputs)
 		edge_outputs = generate_edge_inputs(vertex_outputs)
 		write_results_to_file(vertex_outputs, edge_outputs)
 	end
+
+	private
 
 	def write_results_to_file(vertex_outputs, edge_outputs)
 		File.open(__dir__ + "/test_data/test_vertex_inputs.json", "w") do |f|
@@ -51,6 +54,10 @@ class TestInputGenerator
 		vertex_outputs
 	end
 
+	def initialize_adjacency_matrix(vertex_outputs)
+		Array.new(vertex_outputs.length) { Array.new(vertex_outputs.length) { -1 } }
+	end
+
 	def generate_edge_inputs(vertex_outputs)
 		edge_outputs = []
 		vertex_output_ids = vertex_outputs.map { |el| el[:id] }
@@ -59,22 +66,40 @@ class TestInputGenerator
 
 		# make sure every edge is connected to some other edge
 		for vertex_output in vertex_outputs
-			vertex_a_id = vertex_output[:id]
-			vertex_b_id = vertex_output_ids.sample(1).first
+			while true
+				vertex_a_id = vertex_output[:id]
+				vertex_b_id = vertex_output_ids.sample(1).first
 
-			edge_outputs << { id: edge_id, start_vertex_id: vertex_a_id, end_vertex_id: vertex_b_id }
-			edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b_id, end_vertex_id: vertex_a_id }
-			edge_id += 2
+				# check if an edge already exists
+				unless duplicate_edge_exists?(vertex_a_id, vertex_b_id)
+					edge_outputs << { id: edge_id, start_vertex_id: vertex_a_id, end_vertex_id: vertex_b_id }
+					edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b_id, end_vertex_id: vertex_a_id }
+					# update adj matrix with a placeholder value
+					@adj_mat[vertex_a_id][vertex_b_id] = 0
+					@adj_mat[vertex_b_id][vertex_a_id] = 0
+					edge_id += 2
+					break
+				end
+			end
 		end
 
 
 		for i in 0..((@num_edges - edge_outputs.length) / 2) - 1
 			# make additional edges between random vertices
-			vertex_a, vertex_b = vertex_outputs.sample(2)
 
-			edge_outputs << { id: edge_id, start_vertex_id: vertex_a[:id], end_vertex_id: vertex_b[:id] }
-			edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b[:id], end_vertex_id: vertex_a[:id] }
-			edge_id += 2
+			while true
+				vertex_a, vertex_b = vertex_outputs.sample(2)
+
+				unless duplicate_edge_exists?(vertex_a[:id], vertex_b[:id])
+					edge_outputs << { id: edge_id, start_vertex_id: vertex_a[:id], end_vertex_id: vertex_b[:id] }
+					edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b[:id], end_vertex_id: vertex_a[:id] }
+					# update adj matrix with a placeholder value
+					@adj_mat[vertex_a[:id]][vertex_b[:id]] = 0
+					@adj_mat[vertex_b[:id]][vertex_a[:id]] = 0
+					edge_id += 2
+					break
+				end
+			end
 		end
 
 		# once all edges are generated, calculate the cost of traversal by multiplying distance between
@@ -88,8 +113,14 @@ class TestInputGenerator
 
 			distance = Math.sqrt((end_vertex_data[:x_pos] - start_vertex_data[:x_pos])**2 + (end_vertex_data[:y_pos] - start_vertex_data[:y_pos])**2)
 			edge_output[:cost_of_traversal] = (distance * difficulty).round(2)
+			# update adj matrix with cost of traversal
+			@adj_mat[start_vertex_data[:id]][end_vertex_data[:id]] = cost_of_traversal
 		end
 
 		edge_outputs
+	end
+
+	def duplicate_edge_exists?(vertex_a_id, vertex_b_id)
+		@adj_mat[vertex_a_id][vertex_b_id] != -1
 	end
 end
