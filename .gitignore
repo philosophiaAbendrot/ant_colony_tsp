@@ -2,6 +2,9 @@
 /vendor/bundle
 /vendor/ruby
 
+# ignore test data
+/lib/utils/test_data/
+
 # ignore bundler config
 /.bundle
 
