@@ -1,6 +1,7 @@
 require 'json'
 require 'pqueue'
 
+# https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/
 # https://www.youtube.com/watch?v=_lHSawdgXpI
 # pseudocode for Dijkstra's algorithm
 # dijkstra tells us the shortest path from one node to every other node
