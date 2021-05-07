@@ -13,11 +13,61 @@ class TestInputValidator
 	end
 
 	class Dijkstra
-		def initialize(vertex_inputs:, edge_inputs:)
+		def initialize(vertex_inputs:, edge_inputs:, start_vertex_id: start_vertex_id)
 			@vertex_inputs = vertex_inputs
-			@vertex_hash = initialize_vertex_hash
 			@edge_inputs = edge_inputs
-			@edge_mat = initialize_edge_matrix
+			@vertex_hash = initialize_vertex_hash
+			@start_vertex_id = start_vertex_id
+			@edge_mat = generate_edge_matrix
+		end
+
+		def self.execute(vertex_inputs: vertex_inputs, edge_inputs: edge_inputs, start_vertex_id: start_vertex_id)
+			new(vertex_inputs: vertex_inputs, edge_inputs: edge_inputs).execute
+		end
+
+		def execute
+			dist = {}
+			visited = {}
+
+			for vertex_input in @vertex_inputs
+				dist[vertex_input[:id]] = Float::INFINITY
+			end
+
+			dist[@start_vertex_id] = 0
+
+			# vertex id is first element, distance is second element
+			pq = PQueue.new { |a, b| a[1] > b[1] }
+			pq.add([@start_vertex_id, 0])
+
+			while !pq.empty?
+				u_id, u_dist = pq.pop
+
+				@edge_mat[u_id].compact.select { |edge_input| !visited.include?(edge_input[:end_vertex_id]) }.each do |edge_input|
+					v_id = edge_input[:end_vertex_id]
+				end
+			end
+		end
+
+		private
+
+		def generate_edge_matrix
+			edge_mat = Array.new(vertex_inputs.length) { Array.new(vertex_inputs.length) { nil } }
+
+			for edge_input in edge_inputs
+				edge_mat[edge_input[:start_vertex_id]][edge_input[:end_vertex_id]] = edge_input
+			end
+
+			edge_mat
+		end
+
+		def initialize_vertex_hash
+			vertex_hash = {}
+
+			@vertex_inputs.each do |vertex_input|
+				vertex_hash[vertex_input[:id]] = vertex_input
+			end
+
+			vertex_hash
 		end
 	end
 
