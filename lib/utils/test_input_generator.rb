@@ -1,4 +1,5 @@
 require 'json'
+require (__dir__ + "/test_input_validator.rb")
 
 class TestInputGenerator
 	def initialize(num_vertices:, num_edges:)
@@ -16,10 +17,22 @@ class TestInputGenerator
 	end
 
 	def execute
-		vertex_outputs = generate_vertex_inputs
-		@adj_mat = initialize_adjacency_matrix(vertex_outputs)
-		edge_outputs = generate_edge_inputs(vertex_outputs)
-		write_results_to_file(vertex_outputs, edge_outputs)
+		start_time = Time.now
+		try_count = 1
+
+		loop do
+			vertex_outputs = generate_vertex_inputs
+			@adj_mat = initialize_adjacency_matrix(vertex_outputs)
+			edge_outputs = generate_edge_inputs(vertex_outputs)
+			write_results_to_file(vertex_outputs, edge_outputs)
+			valid = TestInputValidator.execute
+
+			break if valid
+			try_count += 1
+		end
+		end_time = Time.now
+
+		puts "Test inputs generated in #{try_count} attempts. Total execution time = #{(end_time - start_time) * 1000} ms"
 	end
 
 	private
@@ -27,17 +40,31 @@ class TestInputGenerator
 	def write_results_to_file(vertex_outputs, edge_outputs)
 		File.open(__dir__ + "/test_data/test_vertex_inputs.json", "w") do |f|
 			f.write("[")
-			vertex_outputs.each do |line|
+
+			for i in 0..vertex_outputs.length - 1
+				line = vertex_outputs[i]
 				f.write(line.to_json)
+
+				if i != vertex_outputs.length - 1
+					f.write(",")
+				end
 			end
+
 			f.write("]")
 		end
 
 		File.open(__dir__ + "/test_data/test_edge_inputs.json", "w") do |f|
 			f.write("[")
-			edge_outputs.each do |line|
+
+			for i in 0..edge_outputs.length - 1
+				line = edge_outputs[i]
 				f.write(line.to_json)
+
+				if i != edge_outputs.length - 1
+					f.write(",")
+				end
 			end
+
 			f.write("]")
 		end
 
@@ -114,7 +141,7 @@ class TestInputGenerator
 			distance = Math.sqrt((end_vertex_data[:x_pos] - start_vertex_data[:x_pos])**2 + (end_vertex_data[:y_pos] - start_vertex_data[:y_pos])**2)
 			edge_output[:cost_of_traversal] = (distance * difficulty).round(2)
 			# update adj matrix with cost of traversal
-			@adj_mat[start_vertex_data[:id]][end_vertex_data[:id]] = cost_of_traversal
+			@adj_mat[start_vertex_data[:id]][end_vertex_data[:id]] = edge_output[:cost_of_traversal]
 		end
 
 		edge_outputs
@@ -124,3 +151,5 @@ class TestInputGenerator
 		@adj_mat[vertex_a_id][vertex_b_id] != -1
 	end
 end
+
+TestInputGenerator.execute(num_vertices: 100, num_edges: 500)
