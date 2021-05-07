@@ -6,6 +6,17 @@ require 'pqueue'
 # pseudocode for Dijkstra's algorithm
 # dijkstra tells us the shortest path from one node to every other node
 # method dijkstra(start_vertex, graph)
+#   create sptSet (shortest path tree set) that keeps track of vertices included in the shortest path tree
+#   create a hash table distance_table which maps vertex id to distance
+#   assign a distance value to all vertices in the input graph. Initialize all distance values are infinite.
+#   assign distance value as 0 for the source vertex so that it is picked first
+#   while sptSet doesn't include all vertices
+#     pick a vertex u which is not in sptSet and has minimum distance value in vertex_distance_values
+# 		add u to sptSet
+#     iterate through all adjacent vertices v of u
+#       if distance value of u + weight of edge u-v is < distance value of v
+#         update distance value of v to be u + weight of edge u-v
+
 # 	let unvisited_nodes be a set of all the vertices in graph minus the start_vertex
 # 	let distances be a hash table mapping vertex ids to distances, set to infinity by default
 # 	let distances[start_node.id] = 0
