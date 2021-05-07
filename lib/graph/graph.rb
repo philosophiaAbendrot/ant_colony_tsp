@@ -7,7 +7,7 @@ module Graph
 			# initialize edges and Vertices
 			initialize_edges(edges_input)
 			initialize_vertices(vertices_input)
-			populate_incoming_and_outgoing_edges_on_vertices
+			connect_edges_with_vertices
 		end
 
 		private 
@@ -44,7 +44,7 @@ module Graph
 			end
 		end
 
-		def populate_incoming_and_outgoing_edges_on_vertices
+		def connect_edges_with_vertices
 			@edge_class.all.each do |edge|
 				edge.start_vertex.outgoing_edge_ids << edge.id
 				edge.end_vertex.incoming_edge_ids << edge.id
