@@ -32,7 +32,7 @@ class AntColonyTsp
 		true
 	end
 
-	def self.execute(edges:, vertices:,
+	def self.execute(edge_inputs:, vertex_inputs:,
 									 graph_class: Graph::Graph,
 									 vertex_class: Graph::Vertex,
 									 edge_class: Graph::Edge,
@@ -40,8 +40,8 @@ class AntColonyTsp
 									 rand_gen: Utils::RandGen,
 									 num_ants: DEFAULT_NUM_ANTS,
 									 num_iterations: DEFAULT_NUM_ITERATIONS)
-		new(edge_inputs: edges,
-				vertex_inputs: vertices,
+		new(edge_inputs: edge_inputs,
+				vertex_inputs: vertex_inputs,
 				graph_class: graph_class,
 				vertex_class: vertex_class,
 				edge_class: edge_class,
