@@ -1,5 +1,6 @@
 require 'json'
 require_relative "../test_input_validator"
+require_relative "base_graph_generator"
 require_relative "incomplete_graph_generator"
 require_relative "complete_graph_generator"
 

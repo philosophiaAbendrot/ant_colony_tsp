@@ -1,29 +1,11 @@
 module TestInputGenerator
-	class IncompleteGraphGenerator
+	class IncompleteGraphGenerator < BaseGraphGenerator
 		def initialize(num_edges:, num_vertices:)
 			@num_edges = num_edges
 			@num_vertices = num_vertices
 		end
 
-		def execute
-			vertex_outputs = generate_vertex_inputs
-			initialize_adjacency_matrix
-			edge_outputs = generate_edge_inputs(vertex_outputs)
-
-			[vertex_outputs, edge_outputs]
-		end
-
 		private
-
-		def generate_vertex_inputs
-			vertex_outputs = []
-
-			for i in 0..@num_vertices - 1
-				vertex_outputs << { id: i, x_pos: (40 * rand - 20).round(2), y_pos: (40 * rand - 20).round(2) }
-			end
-
-			vertex_outputs
-		end
 
 		def generate_edge_inputs(vertex_outputs)
 			edge_outputs = []
@@ -33,7 +15,7 @@ module TestInputGenerator
 
 			# make sure every vertex is connected to at least two other vertices
 			for vertex_output in vertex_outputs
-				while true
+				loop do
 					vertex_a_id = vertex_output[:id]
 
 					vertex_b_id, vertex_c_id = vertex_outputs.reject { |vertex_data| vertex_data[:id] == vertex_a_id }.sample(2).map { |el| el[:id] }
@@ -61,7 +43,7 @@ module TestInputGenerator
 			for i in 0..((@num_edges - edge_outputs.length) / 2) - 1
 				# make additional edges between random vertices
 
-				while true
+				loop do
 					vertex_a, vertex_b = vertex_outputs.sample(2)
 
 					unless duplicate_edge_exists?(vertex_a[:id], vertex_b[:id])
@@ -92,14 +74,6 @@ module TestInputGenerator
 			end
 
 			edge_outputs
-		end
-
-		def initialize_adjacency_matrix
-			@adj_mat = Array.new(@num_vertices) { Array.new(@num_vertices) { -1 } }
-		end
-
-		def duplicate_edge_exists?(vertex_a_id, vertex_b_id)
-			@adj_mat[vertex_a_id][vertex_b_id] != -1
 		end
 	end
 end
