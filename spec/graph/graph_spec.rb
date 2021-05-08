@@ -14,11 +14,11 @@ describe Graph::Graph do
 		let(:initial_trail_density) { 5 }
 
 		def generate_graph_with_mock_classes
-			Graph::Graph.new(edges_input: edge_params, vertices_input: vertex_params, vertex_class: mock_vertex_class, edge_class: mock_edge_class, initial_trail_density: initial_trail_density)
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: mock_vertex_class, edge_class: mock_edge_class, initial_trail_density: initial_trail_density)
 		end
 
 		def generate_graph
-			Graph::Graph.new(edges_input: edge_params, vertices_input: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge, initial_trail_density: initial_trail_density)
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge, initial_trail_density: initial_trail_density)
 		end
 
 		before(:each) do

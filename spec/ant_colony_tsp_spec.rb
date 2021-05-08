@@ -17,6 +17,11 @@ describe AntColonyTsp do
 		allow(ant_class).to receive(:all).and_return(Array.new(AntColonyTsp::DEFAULT_NUM_ANTS) { double("ant_element", id: 5) })
 		allow(rand_gen_double).to receive(:rand_int).and_return(vertex_params.length - 1)
 	end
+
+	after(:each) do
+		Graph::Edge.destroy_all
+		Graph::Vertex.destroy_all
+	end
 	
 	def initialize_ant_colony_tsp
 		AntColonyTsp.new(edge_inputs: edge_params,
@@ -63,6 +68,10 @@ describe AntColonyTsp do
 	end
 
 	describe "testing placement of ant instances" do
+		before(:each) do
+			instance.send(:initialize_graph)
+		end
+
 		it "should call rand_int on Utils::RandGen class with the number of vertices currently existing" do
 			expect(rand_gen_double).to receive(:rand_int).with(vertex_class.all.length)
 			instance.send(:initialize_ants)
