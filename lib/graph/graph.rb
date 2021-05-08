@@ -1,24 +1,24 @@
 module Graph
 	class Graph
-		def initialize(edges_input:, vertices_input:, vertex_class:, edge_class:, initial_trail_density:)
+		def initialize(edge_inputs:, vertex_inputs:, vertex_class:, edge_class:, initial_trail_density:)
 			@vertex_class = vertex_class
 			@edge_class = edge_class
 
 			# initialize edges and Vertices
-			initialize_edges(edges_input, initial_trail_density)
-			initialize_vertices(vertices_input)
+			initialize_edges(edge_inputs, initial_trail_density)
+			initialize_vertices(vertex_inputs)
 			connect_edges_with_vertices
 		end
 
 		private 
 
-		def initialize_edges(edges_input, trail_density)
+		def initialize_edges(edge_inputs, trail_density)
 			# edge input format
 			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
 
-			raise ArgumentError.new("Edges input is not an array") unless edges_input.is_a?(Array)
+			raise ArgumentError.new("Edges input is not an array") unless edge_inputs.is_a?(Array)
 
-			edges_input.each do |edge_input|
+			edge_inputs.each do |edge_input|
 				edge_input.merge!(vertex_class: @vertex_class)
 
 				if edge_input.is_a?(Hash)
@@ -32,13 +32,13 @@ module Graph
 			@edge_class.set_trail_densities(trail_density)
 		end
 
-		def initialize_vertices(vertices_input)
+		def initialize_vertices(vertex_inputs)
 			# vertex input format
 			# [external_vertex_id: integer, x_pos: float, y_pos: float]
 
-			raise ArgumentError.new("Vertices input is not an array") unless vertices_input.is_a?(Array)
+			raise ArgumentError.new("Vertices input is not an array") unless vertex_inputs.is_a?(Array)
 
-			vertices_input.each do |vertex_input|
+			vertex_inputs.each do |vertex_input|
 				if vertex_input.is_a?(Hash)
 					@vertex_class.new(vertex_input)
 				else

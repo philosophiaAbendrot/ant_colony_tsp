@@ -27,6 +27,7 @@ describe Graph::Graph do
 			allow(mock_edge_class).to receive(:find).with(1).and_return(mock_edge_instance_1)
 			allow(mock_edge_class).to receive(:find).with(2).and_return(mock_edge_instance_2)
 			allow(mock_edge_class).to receive(:all).and_return([mock_edge_instance_1, mock_edge_instance_2])
+			allow(mock_edge_class).to receive(:set_trail_densities)
 		end
 
 		describe "vertices should be initialized" do
