@@ -33,6 +33,7 @@ module Ant
 			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges, visited_vertex_ids: @visited_vertex_ids.dup)
 
 			# if there is no option to move to a vertex, terminate early and return false to indicate that no movement occurred
+
 			return false if cumulative_preferences.empty?
 
 			rand_num = @rand_gen.rand_float

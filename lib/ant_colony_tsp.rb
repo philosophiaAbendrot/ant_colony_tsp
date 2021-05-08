@@ -77,6 +77,12 @@ class AntColonyTsp
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
 
 		execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+
+		# printout results
+		Ant::Ant.all.each do |ant|
+			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids}"
+		end
+
 		true
 	end
 
