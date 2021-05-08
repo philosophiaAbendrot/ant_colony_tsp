@@ -1,11 +1,11 @@
 require 'json'
-require __dir__ + "/modules/databaseable"
-require __dir__ + "/ant/ant"
-require __dir__ + "/ant/vertex_preference_generator"
-require __dir__ + "/graph/graph"
-require __dir__ + "/graph/edge"
-require __dir__ + "/graph/vertex"
-require __dir__ + "/utils/rand_gen"
+require_relative "modules/databaseable"
+require_relative "ant/ant"
+require_relative "ant/vertex_preference_generator"
+require_relative "graph/graph"
+require_relative "graph/edge"
+require_relative "graph/vertex"
+require_relative "utils/rand_gen"
 
 class AntColonyTsp
 	attr_reader :time
