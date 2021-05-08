@@ -9,4 +9,4 @@
 /.bundle
 
 # ignore installed gem
-/.gem
+/*.gem

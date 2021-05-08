@@ -1,3 +1,4 @@
+require 'json'
 require "modules/databaseable"
 require "ant/ant"
 require "ant/vertex_preference_generator"
@@ -35,7 +36,7 @@ class AntColonyTsp
 									 graph_class: Graph::Graph,
 									 vertex_class: Graph::Vertex,
 									 edge_class: Graph::Edge,
-									 ant_class: Ant,
+									 ant_class: Ant::Ant,
 									 rand_gen: Utils::RandGen,
 									 num_ants: DEFAULT_NUM_ANTS,
 									 num_iterations: DEFAULT_NUM_ITERATIONS)
@@ -57,7 +58,29 @@ class AntColonyTsp
 		end
 	end
 
+	def self.drive_test
+		edges_file = File.read("lib/utils/test_data/test_edge_inputs.json")
+		vertices_file = File.read("lib/utils/test_data/test_vertex_inputs.json")
+		edges = JSON.parse(edges_file)
+		vertices = JSON.parse(vertices_file)
+
+		# convert edges and vertices keys to symbols
+		edges = edges.map { |el| symbolize_keys(el) }
+		vertices = vertices.map { |el| symbolize_keys(el) }
+
+		execute(edges: edges, vertices: vertices)
+	end
+
 	private
+
+	def self.symbolize_keys(h)
+		output = {}
+		h.each do |k, v|
+			output[k.to_sym] = v
+		end
+
+		output
+	end
 
 	def initialize_graph(edges_input, vertices_input)
 		@graph = @graph_class.new(edges_input: edges_input, vertices_input: vertices_input, vertex_class: @vertex_class, edge_class: @edge_class)
@@ -68,6 +91,7 @@ class AntColonyTsp
 
 		@num_ants.times do
 			rand_num = @rand_gen.rand_int(@ant_class.all.length)
+			puts "@ant_class.all = #{@ant_class.all}"
 			@ant_class.new(current_vertex_id: @ant_class.all[rand_num].id, vertex_class: @vertex_class, id: ant_id)
 			ant_id += 1
 		end
