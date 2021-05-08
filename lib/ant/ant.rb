@@ -48,6 +48,9 @@ module Ant
 				end
 			end
 
+			puts "=========================="
+			puts "outgoing_edges = #{outgoing_edges}"
+			puts "selected_vertex_id = #{selected_vertex_id}"
 			selected_edge_id = outgoing_edges.select { |edge| edge.end_vertex_id == selected_vertex_id }.first.id
 
 			# move to new vertex

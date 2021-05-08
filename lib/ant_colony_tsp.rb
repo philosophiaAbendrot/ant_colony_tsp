@@ -1,11 +1,11 @@
 require 'json'
-require "modules/databaseable"
-require "ant/ant"
-require "ant/vertex_preference_generator"
-require "graph/graph"
-require "graph/edge"
-require "graph/vertex"
-require "utils/rand_gen"
+require __dir__ + "/modules/databaseable"
+require __dir__ + "/ant/ant"
+require __dir__ + "/ant/vertex_preference_generator"
+require __dir__ + "/graph/graph"
+require __dir__ + "/graph/edge"
+require __dir__ + "/graph/vertex"
+require __dir__ + "/utils/rand_gen"
 
 class AntColonyTsp
 	attr_reader :time
@@ -40,16 +40,18 @@ class AntColonyTsp
 									 rand_gen: Utils::RandGen,
 									 num_ants: DEFAULT_NUM_ANTS,
 									 num_iterations: DEFAULT_NUM_ITERATIONS)
-		@main_instance = new(edges: edges,
-							vertices: vertices,
-							graph_class: graph_class,
-							vertex_class: vertex_class,
-							edge_class: edge_class,
-							ant_class: ant_class,
-							rand_gen: rand_gen,
-							num_ants: num_ants,
-							num_iterations: num_iterations)
+		new(edges: edges,
+				vertices: vertices,
+				graph_class: graph_class,
+				vertex_class: vertex_class,
+				edge_class: edge_class,
+				ant_class: ant_class,
+				rand_gen: rand_gen,
+				num_ants: num_ants,
+				num_iterations: num_iterations).execute
+	end
 
+	def execute
 		@ant_class.all.each do |ant|
 			# make every ant execute one tour
 			for i in 0..@num_vertices - 2
@@ -59,8 +61,8 @@ class AntColonyTsp
 	end
 
 	def self.drive_test
-		edges_file = File.read("lib/utils/test_data/test_edge_inputs.json")
-		vertices_file = File.read("lib/utils/test_data/test_vertex_inputs.json")
+		edges_file = File.read(__dir__ + "/utils/test_data/test_edge_inputs.json")
+		vertices_file = File.read(__dir__ + "/utils/test_data/test_vertex_inputs.json")
 		edges = JSON.parse(edges_file)
 		vertices = JSON.parse(vertices_file)
 
@@ -91,8 +93,7 @@ class AntColonyTsp
 
 		@num_ants.times do
 			rand_num = @rand_gen.rand_int(@ant_class.all.length)
-			puts "@ant_class.all = #{@ant_class.all}"
-			@ant_class.new(current_vertex_id: @ant_class.all[rand_num].id, vertex_class: @vertex_class, id: ant_id)
+			@ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, vertex_class: @vertex_class, id: ant_id, edge_class: @edge_class)
 			ant_id += 1
 		end
 	end
