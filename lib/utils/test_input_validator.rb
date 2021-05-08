@@ -7,7 +7,6 @@ class TestInputValidator
 		@vertex_inputs = JSON.parse(File.read(__dir__ + "/test_data/test_vertex_inputs.json"))
 		@edge_inputs = JSON.parse(File.read(__dir__ + "/test_data/test_edge_inputs.json"))
 		end_time = Time.now
-		puts "files read in #{(end_time - start_time) * 1_000} ms"
 	end
 
 	def self.execute
@@ -23,7 +22,6 @@ class TestInputValidator
 		# check that all values are non-infinite
 		valid = !distances.values.include?(Float::INFINITY)
 		end_time = Time.now
-		puts "compute time = #{(end_time - start_time) * 1_000} ms"
 		valid
 	end
 
@@ -94,6 +92,3 @@ class TestInputValidator
 		end
 	end
 end
-
-result = TestInputValidator.execute
-puts "data valid = #{result}"

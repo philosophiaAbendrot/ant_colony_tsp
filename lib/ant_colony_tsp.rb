@@ -67,11 +67,15 @@ class AntColonyTsp
 	end
 
 	def self.drive_test
+		start_time = Time.now
 		edges_file = File.read(__dir__ + "/utils/test_data/test_edge_inputs.json")
 		vertices_file = File.read(__dir__ + "/utils/test_data/test_vertex_inputs.json")
 		edge_inputs = JSON.parse(edges_file)
 		vertex_inputs = JSON.parse(vertices_file)
+		end_time = Time.now
+		puts "reading and parsing: #{(end_time - start_time) * 1_000} ms"
 
+		start_time = Time.now
 		# convert edges and vertices keys to symbols
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
@@ -82,7 +86,9 @@ class AntColonyTsp
 		Ant::Ant.all.each do |ant|
 			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids}"
 		end
+		end_time = Time.now
 
+		puts "execution time: #{(end_time - start_time) * 1_000} ms"
 		true
 	end
 
