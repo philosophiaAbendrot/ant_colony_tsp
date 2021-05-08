@@ -14,7 +14,6 @@ module Ant
 
 			# normalize the mapping
 			normalized_preference_mapping = preference_mapping.map { |el| [el[0], el[1] / sum_products]  }
-
 			normalized_preference_mapping
 		end
 	end

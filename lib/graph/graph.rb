@@ -1,18 +1,18 @@
 module Graph
 	class Graph
-		def initialize(edges_input:, vertices_input:, vertex_class:, edge_class:)
+		def initialize(edges_input:, vertices_input:, vertex_class:, edge_class:, initial_trail_density:)
 			@vertex_class = vertex_class
 			@edge_class = edge_class
 
 			# initialize edges and Vertices
-			initialize_edges(edges_input)
+			initialize_edges(edges_input, initial_trail_density)
 			initialize_vertices(vertices_input)
 			connect_edges_with_vertices
 		end
 
 		private 
 
-		def initialize_edges(edges_input)
+		def initialize_edges(edges_input, trail_density)
 			# edge input format
 			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
 
@@ -27,6 +27,9 @@ module Graph
 					raise ArgumentError.new("Edge input is not in hash format")
 				end
 			end
+
+			# set initial trail densities
+			@edge_class.set_trail_densities(trail_density)
 		end
 
 		def initialize_vertices(vertices_input)

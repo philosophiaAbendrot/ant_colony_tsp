@@ -23,6 +23,7 @@ class AntColonyTsp
 		@num_ants = num_ants
 		@num_iterations = num_iterations
 		@num_vertices = vertices.length
+		@initial_trail_density = 5
 
 		@time = 0
 
@@ -30,6 +31,7 @@ class AntColonyTsp
 		initialize_graph(edges, vertices)
 		# initialize ants and place them on random vertices
 		initialize_ants
+		true
 	end
 
 	def self.execute(edges:, vertices:,
@@ -58,6 +60,7 @@ class AntColonyTsp
 				break unless ant.move_to_next_vertex
 			end
 		end
+		true
 	end
 
 	def self.drive_test
@@ -71,6 +74,7 @@ class AntColonyTsp
 		vertices = vertices.map { |el| symbolize_keys(el) }
 
 		execute(edges: edges, vertices: vertices)
+		true
 	end
 
 	private
@@ -85,7 +89,7 @@ class AntColonyTsp
 	end
 
 	def initialize_graph(edges_input, vertices_input)
-		@graph = @graph_class.new(edges_input: edges_input, vertices_input: vertices_input, vertex_class: @vertex_class, edge_class: @edge_class)
+		@graph = @graph_class.new(edges_input: edges_input, vertices_input: vertices_input, vertex_class: @vertex_class, edge_class: @edge_class, initial_trail_density: @initial_trail_density)
 	end
 
 	def initialize_ants
