@@ -91,20 +91,27 @@ class TestInputGenerator
 
 		edge_id = 0
 
-		# make sure every edge is connected to some other edge
+		# make sure every vertex is connected to at least two other vertices
 		for vertex_output in vertex_outputs
 			while true
 				vertex_a_id = vertex_output[:id]
-				vertex_b_id = vertex_output_ids.sample(1).first
+
+				vertex_b_id, vertex_c_id = vertex_outputs.reject { |vertex_data| vertex_data[:id] == vertex_a_id }.sample(2).map { |el| el[:id] }
 
 				# check if an edge already exists
 				unless duplicate_edge_exists?(vertex_a_id, vertex_b_id)
 					edge_outputs << { id: edge_id, start_vertex_id: vertex_a_id, end_vertex_id: vertex_b_id }
 					edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b_id, end_vertex_id: vertex_a_id }
+
+					edge_outputs << { id: edge_id + 2, start_vertex_id: vertex_a_id, end_vertex_id: vertex_c_id }
+					edge_outputs << { id: edge_id + 3, start_vertex_id: vertex_c_id, end_vertex_id: vertex_a_id }
+
 					# update adj matrix with a placeholder value
 					@adj_mat[vertex_a_id][vertex_b_id] = 0
 					@adj_mat[vertex_b_id][vertex_a_id] = 0
-					edge_id += 2
+					@adj_mat[vertex_a_id][vertex_c_id] = 0
+					@adj_mat[vertex_c_id][vertex_a_id] = 0
+					edge_id += 4
 					break
 				end
 			end
@@ -152,4 +159,4 @@ class TestInputGenerator
 	end
 end
 
-TestInputGenerator.execute(num_vertices: 100, num_edges: 500)
+TestInputGenerator.execute(num_vertices: 100, num_edges: 800)
