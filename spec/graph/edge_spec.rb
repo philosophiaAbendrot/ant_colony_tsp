@@ -44,20 +44,8 @@ describe Graph::Edge do
 		end
 	end
 
-	describe "initialize_delta_trail_densities" do
-		it "should set delta trail densities to 0 for all edges" do
-			id = 1
-
-			20.times do
-				params = { id: id, start_vertex_id: rand(30), end_vertex_id: rand(30), cost_of_traversal: 10 * rand, vertex_class: Graph::Vertex }
-				edge = Graph::Edge.new(params)
-				edge.delta_trail_density = 3
-				id += 1
-			end
-
-			Graph::Edge.initialize_delta_trail_densities
-			trail_densities = Graph::Edge.all.map(&:delta_trail_density)
-			expect(trail_densities.reject { |el| el == 0 }.length).to eq(0)
+	describe "add_pheromones" do
+		it "should update the trail density on the edge" do
 		end
 	end
 end
