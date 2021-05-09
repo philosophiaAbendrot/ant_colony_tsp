@@ -63,6 +63,20 @@ class AntColonyTsp
 				break unless ant.move_to_next_vertex
 			end
 		end
+
+		# find ant with shortest path
+		ant_with_shortest_path = nil
+		shortest_path = Float::INFINITY
+
+		@ant_class.all.each do |ant|
+			if (path_length = ant.path_length) < shortest_path
+				shortest_path = path_length
+				ant_with_shortest_path = ant
+			end
+		end
+
+		puts "shortest path = #{shortest_path}"
+
 		true
 	end
 
