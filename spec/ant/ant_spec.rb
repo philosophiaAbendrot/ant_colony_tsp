@@ -205,4 +205,43 @@ describe Ant::Ant do
 			ant.lay_pheromones
 		end
 	end
+
+	describe "reset_to_original_position" do
+		# vertices input format: [id, x_pos, y_pos]
+		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
+		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
+		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
+		let(:default_pheromone_density) { 3 }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: Graph::Edge, rand_gen: Utils::RandGen } }
+
+		before(:each) do
+			generate_vertices(vertex_inputs)
+			generate_edges(edge_inputs, default_pheromone_density)
+
+			# set up connections on the vertex the ant is on
+			vertex_1 = Graph::Vertex.find(1)
+			vertex_1.outgoing_edge_ids = [1, 2, 3]
+
+			ant.current_vertex_id = 3
+			ant.visited_vertex_ids = [1, 2, 3]
+			ant.visited_edge_ids = [1, 2, 3]
+		end
+
+		it "should clear visited edge ids" do
+			Ant::Ant.reset_to_original_position
+			expect(ant.visited_edge_ids).to eq([])
+		end
+
+		it "should clear visited vertex ids" do
+			original_vertex_id = ant.visited_vertex_ids[0]
+			Ant::Ant.reset_to_original_position
+			expect(ant.visited_vertex_ids).to eq([original_vertex_id])
+		end
+
+		it "should place ant in the original position" do
+			original_vertex_id = ant.visited_vertex_ids[0]
+			Ant::Ant.reset_to_original_position
+			expect(ant.current_vertex_id).to eq(original_vertex_id)
+		end
+	end
 end

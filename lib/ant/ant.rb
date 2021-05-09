@@ -20,6 +20,15 @@ module Ant
 			@@q = q.to_f
 		end
 
+		def self.reset_to_original_position
+			all.each do |ant|
+				first_vertex_id = ant.visited_vertex_ids[0]
+				ant.visited_vertex_ids = [first_vertex_id]
+				ant.visited_edge_ids = []
+				ant.current_vertex_id = first_vertex_id
+			end
+		end
+
 		def current_vertex
 			@vertex_class.find(@current_vertex_id)
 		end
