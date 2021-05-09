@@ -10,7 +10,3 @@ ruby '2.7.1'
 
 gem 'rspec'
 gem 'json'
-
-group :development do
-	gem 'pqueue'
-end

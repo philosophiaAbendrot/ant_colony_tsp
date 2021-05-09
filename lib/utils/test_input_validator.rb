@@ -1,5 +1,4 @@
 require 'json'
-require 'pqueue'
 
 class TestInputValidator
 	def initialize
@@ -22,6 +21,7 @@ class TestInputValidator
 		# check that all values are non-infinite
 		valid = !distances.values.include?(Float::INFINITY)
 		end_time = Time.now
+		puts "time taken = #{(end_time - start_time) * 1_000} ms"
 		valid
 	end
 
@@ -49,11 +49,11 @@ class TestInputValidator
 			dist[@start_vertex_id] = 0
 
 			# vertex id is first element, distance is second element
-			pq = PQueue.new { |a, b| a[1] > b[1] }
-			pq.push([@start_vertex_id, 0])
+			pq = [[@start_vertex_id, 0]]
 
 			while !pq.empty?
-				u_id, u_dist = pq.pop
+				pq.sort_by! { |el| el[1] }
+				u_id, u_dist = pq.shift
 
 				@edge_mat[u_id].compact.select { |edge_input| !visited.include?(edge_input["end_vertex_id"]) }.each do |edge_input|
 					v_id = edge_input["end_vertex_id"]
@@ -61,7 +61,7 @@ class TestInputValidator
 
 					if u_dist + dist_uv < dist[v_id]
 						dist[v_id] = u_dist + dist_uv
-						pq.push([v_id, dist[v_id]])
+						pq << [v_id, dist[v_id]]
 					end
 				end
 			end
