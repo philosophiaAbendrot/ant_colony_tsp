@@ -59,5 +59,9 @@ module Ant
 			# return true to indicate that ant has moved successfully
 			true
 		end
+
+		def path_length
+			@visited_edge_ids.map { |el| @edge_class.find(el).cost_of_traversal }.sum
+		end
 	end
 end

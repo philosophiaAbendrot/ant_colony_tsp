@@ -75,18 +75,18 @@ class AntColonyTsp
 		end_time = Time.now
 		puts "reading and parsing: #{(end_time - start_time) * 1_000} ms"
 
-		start_time = Time.now
 		# convert edges and vertices keys to symbols
+		start_time = Time.now
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
 
 		execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+		end_time = Time.now
 
 		# printout results
 		Ant::Ant.all.each do |ant|
-			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids}"
+			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.path_length}"
 		end
-		end_time = Time.now
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"
 		true
