@@ -15,7 +15,8 @@ class AntColonyTsp
 	INITIAL_TRAIL_DENSITY = 0.05
 	BETA_VALUE = 1
 	Q = 100
-	RHO = 0.5
+	RHO = 0.8
+	NUM_ITERATIONS = 20
 
 	def initialize(edge_inputs:, vertex_inputs:, graph_class:, vertex_class:, edge_class:, ant_class:, rand_gen:, num_iterations:, num_ants:)
 		@ant_class = ant_class
@@ -59,37 +60,50 @@ class AntColonyTsp
 		initialize_graph
 		# initialize ants and place them on random vertices
 		initialize_ants
+		iteration_count = 0
+		global_shortest_path = nil
+		global_shortest_path_length = Float::INFINITY
 
-		@ant_class.all.each do |ant|
-			# make every ant execute one tour
-			for i in 0..@num_vertices - 2
-				break unless ant.move_to_next_vertex
+		for iteration_count in 0..NUM_ITERATIONS - 1
+			@ant_class.all.each do |ant|
+				# make every ant execute one tour
+				for i in 0..@num_vertices - 2
+					break unless ant.move_to_next_vertex
+				end
 			end
-		end
 
-		# find ant with shortest path
-		ant_with_shortest_path = nil
-		shortest_path = Float::INFINITY
+			# find ant with shortest path
+			ant_with_shortest_path = nil
+			shortest_path = nil
+			shortest_path_length = Float::INFINITY
 
-		@ant_class.all.each do |ant|
-			if (path_length = ant.find_path_length) < shortest_path
-				shortest_path = path_length
-				ant_with_shortest_path = ant
+			@ant_class.all.each do |ant|
+				if (path_length = ant.find_path_length) < shortest_path_length
+					shortest_path = ant.visited_edge_ids
+					shortest_path_length = path_length
+					ant_with_shortest_path = ant
+				end
 			end
+
+			# lay pheromones on the shortest path
+			ant_with_shortest_path.lay_pheromones
+
+			# update trail densities
+			@edge_class.update_trail_densities
+
+			# reset ants to original positions
+			@ant_class.reset_to_original_position
+
+			# update global shortest path
+			if shortest_path_length < global_shortest_path_length
+				global_shortest_path_length = shortest_path_length
+				global_shortest_path = shortest_path
+			end
+
+			puts "i:#{iteration_count} shortest path length = #{shortest_path_length}"
 		end
 
-		# lay pheromones on the shortest path
-		ant_with_shortest_path.lay_pheromones
-
-		# update trail densities
-		@edge_class.update_trail_densities
-
-		puts "edge trail densities:"
-		@edge_class.all.each do |edge|
-			puts "#{edge.id} || #{edge.cost_of_traversal} || #{edge.trail_density}"
-		end
-
-		true
+		[global_shortest_path, global_shortest_path_length]
 	end
 
 	def self.drive_test
@@ -106,13 +120,17 @@ class AntColonyTsp
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
 
-		execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+		shortest_path, shortest_path_length = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+
+		puts "global shortest path found = #{shortest_path}"
+		puts "global shortest path length = #{shortest_path_length}"
+
 		end_time = Time.now
 
 		# printout results
-		Ant::Ant.all.each do |ant|
-			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.find_path_length}"
-		end
+		# Ant::Ant.all.each do |ant|
+		# 	puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.find_path_length}"
+		# end
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"
 		true
