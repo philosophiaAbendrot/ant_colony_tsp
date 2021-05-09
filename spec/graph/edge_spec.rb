@@ -54,15 +54,54 @@ describe Graph::Edge do
 
 		it "should update the trail density on the edge" do
 			initial_density = 3
-			rho = 0.5
 			delta_trail_density = 7
-			expected_trail_density = 0.5 * 3 + 7
 
 			Graph::Edge.set_trail_densities(3)
-			Graph::Edge.set_trail_persistence(rho)
 
 			edge.add_pheromones(delta_trail_density)
-			expect(edge.trail_density).to eq(0.5 * 3 + 7)
+			expect(edge.delta_trail_density).to eq(delta_trail_density)
+		end
+	end
+
+	describe "update_trail_densities" do
+		let(:edge_params) { [{ id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5, vertex_class: Graph::Vertex },
+												{ id: 2, start_vertex_id: 3, end_vertex_id: 9, cost_of_traversal: 8.6, vertex_class: Graph::Vertex }] }
+		let(:initial_density) { 3 }
+		let(:trail_persistence) { 0.7 }
+
+		before(:each) do
+			edge_params.each do |edge_param|
+				Graph::Edge.new(edge_param)
+			end
+
+			Graph::Edge.set_trail_densities(initial_density)
+			Graph::Edge.set_trail_persistence(trail_persistence)
+		end
+
+		it "should update the trail density on the edge" do
+			delta_trail_density = 4
+
+			first_edge = Graph::Edge.find(1)
+			second_edge = Graph::Edge.find(2)
+
+			first_edge.add_pheromones(delta_trail_density)
+			Graph::Edge.update_trail_densities
+
+			expect(first_edge.trail_density).to eq(initial_density * trail_persistence + delta_trail_density)
+			expect(second_edge.trail_density).to eq(initial_density * trail_persistence)
+		end	
+
+		it "should set delta_trail_density on the edge to 0" do
+			delta_trail_density = 0
+
+			first_edge = Graph::Edge.find(1)
+			second_edge = Graph::Edge.find(2)
+
+			first_edge.add_pheromones(delta_trail_density)
+			Graph::Edge.update_trail_densities
+
+			expect(first_edge.delta_trail_density).to eq(0.0)
+			expect(second_edge.delta_trail_density).to eq(0.0)
 		end
 	end
 end

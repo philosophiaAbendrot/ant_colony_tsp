@@ -4,7 +4,7 @@ module Graph
 
 		@@rho = nil
 
-		attr_accessor :trail_density
+		attr_accessor :trail_density, :delta_trail_density
 
 		attr_reader :id, :start_vertex_id, :end_vertex_id, :cost_of_traversal
 
@@ -14,6 +14,7 @@ module Graph
 			@start_vertex_id = start_vertex_id
 			@end_vertex_id = end_vertex_id
 			@trail_density = 0.0
+			@delta_trail_density = 0.0
 			@vertex_class = vertex_class
 		end
 
@@ -28,6 +29,13 @@ module Graph
 			end
 		end
 
+		def self.update_trail_densities
+			all.each do |edge|
+				edge.trail_density = edge.trail_density * @@rho + edge.delta_trail_density
+				edge.delta_trail_density = 0.0
+			end
+		end
+
 		def start_vertex
 			@vertex_class.find(@start_vertex_id)
 		end
@@ -37,7 +45,7 @@ module Graph
 		end
 
 		def add_pheromones(delta)
-			@trail_density = @trail_density * @@rho + delta
+			@delta_trail_density = delta
 		end
 	end
 end

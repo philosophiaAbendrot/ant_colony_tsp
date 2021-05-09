@@ -53,6 +53,7 @@ describe AntColonyTsp do
 		let(:ant) { Ant::Ant.all.first }
 
 		before(:each) do
+			allow(ant_class).to receive(:set_pheromone_laying_rate)
 			instance.send(:initialize_graph)
 		end
 

@@ -12,13 +12,14 @@ describe Graph::Graph do
 		let(:mock_edge_instance_1) { double("edge_1", id: 1, start_vertex_id: 3, end_vertex_id: 4, start_vertex: mock_vertex_instance_3, end_vertex: mock_vertex_instance_4) }
 		let(:mock_edge_instance_2) { double("edge_2", id: 2, start_vertex_id: 4, end_vertex_id: 3, start_vertex: mock_vertex_instance_4, end_vertex: mock_vertex_instance_3) }
 		let(:initial_trail_density) { 5 }
+		let(:rho) { 0.7 }
 
 		def generate_graph_with_mock_classes
-			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: mock_vertex_class, edge_class: mock_edge_class, initial_trail_density: initial_trail_density)
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: mock_vertex_class, edge_class: mock_edge_class, initial_trail_density: initial_trail_density, trail_persistence: rho)
 		end
 
 		def generate_graph
-			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge, initial_trail_density: initial_trail_density)
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge, initial_trail_density: initial_trail_density, trail_persistence: rho)
 		end
 
 		before(:each) do
@@ -28,6 +29,7 @@ describe Graph::Graph do
 			allow(mock_edge_class).to receive(:find).with(2).and_return(mock_edge_instance_2)
 			allow(mock_edge_class).to receive(:all).and_return([mock_edge_instance_1, mock_edge_instance_2])
 			allow(mock_edge_class).to receive(:set_trail_densities)
+			allow(mock_edge_class).to receive(:set_trail_persistence)
 		end
 
 		describe "vertices should be initialized" do

@@ -78,7 +78,11 @@ class AntColonyTsp
 			end
 		end
 
+		# lay pheromones on the shortest path
 		ant_with_shortest_path.lay_pheromones
+
+		# update trail densities
+		@edge_class.update_trail_densities
 
 		puts "edge trail densities:"
 		@edge_class.all.each do |edge|
