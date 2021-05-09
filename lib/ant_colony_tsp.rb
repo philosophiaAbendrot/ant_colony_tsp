@@ -12,7 +12,10 @@ class AntColonyTsp
 	DEFAULT_NUM_ANTS = 20
 	DEFAULT_NUM_ITERATIONS = 100
 	ALPHA_VALUE = 1
+	INITIAL_TRAIL_DENSITY = 0.3
 	BETA_VALUE = 1
+	Q = 100
+	RHO = 0.5
 
 	def initialize(edge_inputs:, vertex_inputs:, graph_class:, vertex_class:, edge_class:, ant_class:, rand_gen:, num_iterations:, num_ants:)
 		@ant_class = ant_class
@@ -23,7 +26,7 @@ class AntColonyTsp
 		@num_ants = num_ants
 		@num_iterations = num_iterations
 		@num_vertices = vertex_inputs.length
-		@initial_trail_density = 5
+		@initial_trail_density = INITIAL_TRAIL_DENSITY
 		@edge_inputs = edge_inputs
 		@vertex_inputs = vertex_inputs
 
@@ -75,7 +78,12 @@ class AntColonyTsp
 			end
 		end
 
-		puts "shortest path = #{shortest_path}"
+		ant_with_shortest_path.lay_pheromones
+
+		puts "edge trail densities:"
+		@edge_class.all.each do |edge|
+			puts "#{edge.id} || #{edge.cost_of_traversal} || #{edge.trail_density}"
+		end
 
 		true
 	end
@@ -118,7 +126,7 @@ class AntColonyTsp
 	end
 
 	def initialize_graph
-		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs, vertex_class: @vertex_class, edge_class: @edge_class, initial_trail_density: @initial_trail_density)
+		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs, vertex_class: @vertex_class, edge_class: @edge_class, initial_trail_density: @initial_trail_density, trail_persistence: RHO)
 	end
 
 	def initialize_ants
@@ -129,5 +137,7 @@ class AntColonyTsp
 			@ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, vertex_class: @vertex_class, id: ant_id, edge_class: @edge_class)
 			ant_id += 1
 		end
+
+		@ant_class.set_pheromone_laying_rate(Q)
 	end
 end

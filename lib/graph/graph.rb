@@ -1,22 +1,23 @@
 module Graph
 	class Graph
-		def initialize(edge_inputs:, vertex_inputs:, vertex_class:, edge_class:, initial_trail_density:)
+		def initialize(edge_inputs:, vertex_inputs:, vertex_class:, edge_class:, initial_trail_density:, trail_persistence:)
 			@vertex_class = vertex_class
 			@edge_class = edge_class
 
 			# initialize edges and Vertices
-			initialize_edges(edge_inputs, initial_trail_density)
+			initialize_edges(edge_inputs, initial_trail_density, trail_persistence)
 			initialize_vertices(vertex_inputs)
 			connect_edges_with_vertices
 		end
 
 		private 
 
-		def initialize_edges(edge_inputs, trail_density)
+		def initialize_edges(edge_inputs, trail_density, trail_persistence)
 			# edge input format
 			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
 
 			raise ArgumentError.new("Edges input is not an array") unless edge_inputs.is_a?(Array)
+
 
 			edge_inputs.each do |edge_input|
 				edge_input.merge!(vertex_class: @vertex_class)
@@ -30,6 +31,8 @@ module Graph
 
 			# set initial trail densities
 			@edge_class.set_trail_densities(trail_density)
+			# set trail persistence
+			@edge_class.set_trail_persistence(trail_persistence)
 		end
 
 		def initialize_vertices(vertex_inputs)
