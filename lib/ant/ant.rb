@@ -16,7 +16,7 @@ module Ant
 			@rand_gen = rand_gen
 		end
 
-		def self.set_q_value(q)
+		def self.set_pheromone_laying_rate(q)
 			@@q = q.to_f
 		end
 

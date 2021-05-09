@@ -14,11 +14,10 @@ module Graph
 			@start_vertex_id = start_vertex_id
 			@end_vertex_id = end_vertex_id
 			@trail_density = 0.0
-			@delta_trail_density = 0.0
 			@vertex_class = vertex_class
 		end
 
-		def self.set_rho_value(rho)
+		def self.set_trail_persistence(rho)
 			@@rho = rho.to_f
 		end
 
@@ -38,7 +37,7 @@ module Graph
 		end
 
 		def add_pheromones(delta)
-
+			@trail_density = @trail_density * @@rho + delta
 		end
 	end
 end

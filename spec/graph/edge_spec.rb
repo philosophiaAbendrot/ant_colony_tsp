@@ -45,7 +45,24 @@ describe Graph::Edge do
 	end
 
 	describe "add_pheromones" do
+		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5, vertex_class: Graph::Vertex } }
+		let(:edge) { Graph::Edge.find(edge_params[:id]) }
+
+		before(:each) do
+			Graph::Edge.new(edge_params)
+		end
+
 		it "should update the trail density on the edge" do
+			initial_density = 3
+			rho = 0.5
+			delta_trail_density = 7
+			expected_trail_density = 0.5 * 3 + 7
+
+			Graph::Edge.set_trail_densities(3)
+			Graph::Edge.set_trail_persistence(rho)
+
+			edge.add_pheromones(delta_trail_density)
+			expect(edge.trail_density).to eq(0.5 * 3 + 7)
 		end
 	end
 end

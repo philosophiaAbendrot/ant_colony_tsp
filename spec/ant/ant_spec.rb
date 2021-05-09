@@ -197,7 +197,7 @@ describe Ant::Ant do
 		end
 
 		it "should call add_pheromones with delta value Q/Lk on each edge" do
-			Ant::Ant.set_q_value(q)
+			Ant::Ant.set_pheromone_laying_rate(q)
 			expected_density = q.to_f / ant.find_path_length
 			expect(mock_edge_1).to receive(:add_pheromones).with(expected_density)
 			expect(mock_edge_2).to receive(:add_pheromones).with(expected_density)
