@@ -69,7 +69,7 @@ class AntColonyTsp
 		shortest_path = Float::INFINITY
 
 		@ant_class.all.each do |ant|
-			if (path_length = ant.path_length) < shortest_path
+			if (path_length = ant.find_path_length) < shortest_path
 				shortest_path = path_length
 				ant_with_shortest_path = ant
 			end
@@ -99,7 +99,7 @@ class AntColonyTsp
 
 		# printout results
 		Ant::Ant.all.each do |ant|
-			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.path_length}"
+			puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.find_path_length}"
 		end
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"

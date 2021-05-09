@@ -139,7 +139,7 @@ describe Ant::Ant do
 		end
 	end
 
-	describe "calculate path length" do
+	describe "find_path_length" do
 		# vertices input format: [id, x_pos, y_pos]
 		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
 		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
@@ -162,7 +162,47 @@ describe Ant::Ant do
 
 		it "should return the correct path length" do
 			expected_length = edge_inputs.map { |el| el[1] }.sum
-			expect(ant.path_length).to eq(expected_length)
+			expect(ant.find_path_length).to eq(expected_length)
+		end
+	end
+
+	describe "lay_phermones" do
+		# vertices input format: [id, x_pos, y_pos]
+		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
+		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
+		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
+		let(:mock_edge_class) { double("mock_edge_class", all: [mock_edge_1, mock_edge_2, mock_edge_3]) }
+		let(:mock_edge_1) { double("edge1", cost_of_traversal: 5.3) }
+		let(:mock_edge_2) { double("edge2", cost_of_traversal: 7.0) }
+		let(:mock_edge_3) { double("edge3", cost_of_traversal: 1.1) }
+		let(:default_pheromone_density) { 3 }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: mock_edge_class, rand_gen: Utils::RandGen } }
+		let(:q) { 5 }
+
+		before(:each) do
+			generate_vertices(vertex_inputs)
+			generate_edges(edge_inputs, default_pheromone_density)
+
+			allow(mock_edge_class).to receive(:find).with(1).and_return(mock_edge_1)
+			allow(mock_edge_class).to receive(:find).with(2).and_return(mock_edge_2)
+			allow(mock_edge_class).to receive(:find).with(3).and_return(mock_edge_3)
+
+			# set up connections on the vertex the ant is on
+			vertex_1 = Graph::Vertex.find(1)
+			vertex_1.outgoing_edge_ids = [1, 2, 3]
+
+			ant.current_vertex_id = 1
+			ant.visited_vertex_ids = [1, 2, 3]
+			ant.visited_edge_ids = [1, 2, 3]
+		end
+
+		it "should call add_pheromones with delta value Q/Lk on each edge" do
+			Ant::Ant.set_q_value(q)
+			expected_density = q.to_f / ant.find_path_length
+			expect(mock_edge_1).to receive(:add_pheromones).with(expected_density)
+			expect(mock_edge_2).to receive(:add_pheromones).with(expected_density)
+			expect(mock_edge_3).to receive(:add_pheromones).with(expected_density)
+			ant.lay_pheromones
 		end
 	end
 end

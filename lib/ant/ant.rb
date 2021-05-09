@@ -2,6 +2,8 @@ module Ant
 	class Ant
 		extend Databaseable
 
+		@@q = nil
+
 		attr_accessor :current_vertex_id, :visited_vertex_ids, :visited_edge_ids
 
 		def initialize(current_vertex_id:, vertex_class:, id:, edge_class:, rand_gen: Utils::RandGen)
@@ -12,6 +14,10 @@ module Ant
 			@vertex_class = vertex_class
 			@edge_class = edge_class
 			@rand_gen = rand_gen
+		end
+
+		def self.set_q_value(q)
+			@@q = q.to_f
 		end
 
 		def current_vertex
@@ -60,8 +66,16 @@ module Ant
 			true
 		end
 
-		def path_length
+		def find_path_length
 			@visited_edge_ids.map { |el| @edge_class.find(el).cost_of_traversal }.sum
+		end
+
+		def lay_pheromones
+			trail_density = @@q / find_path_length
+
+			@visited_edge_ids.map { |el| @edge_class.find(el) }.each do |edge|
+				edge.add_pheromones(trail_density)
+			end
 		end
 	end
 end
