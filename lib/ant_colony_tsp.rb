@@ -44,6 +44,9 @@ class AntColonyTsp
 									 rand_gen: Utils::RandGen,
 									 num_ants: DEFAULT_NUM_ANTS,
 									 num_iterations: DEFAULT_NUM_ITERATIONS)
+		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
+		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
+	
 		new(edge_inputs: edge_inputs,
 				vertex_inputs: vertex_inputs,
 				graph_class: graph_class,
@@ -117,9 +120,6 @@ class AntColonyTsp
 
 		# convert edges and vertices keys to symbols
 		start_time = Time.now
-		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
-		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
-
 		shortest_path, shortest_path_length = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
 
 		puts "global shortest path found = #{shortest_path}"
