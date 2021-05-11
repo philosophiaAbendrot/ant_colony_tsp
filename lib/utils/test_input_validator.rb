@@ -1,10 +1,10 @@
 require 'json'
 
 class TestInputValidator
-	def initialize
+	def initialize(vertex_inputs, edge_inputs)
 		start_time = Time.now
-		@vertex_inputs = JSON.parse(File.read(__dir__ + "/test_data/test_vertex_inputs.json"))
-		@edge_inputs = JSON.parse(File.read(__dir__ + "/test_data/test_edge_inputs.json"))
+		@vertex_inputs = vertex_inputs
+		@edge_inputs = edge_inputs
 		end_time = Time.now
 	end
 

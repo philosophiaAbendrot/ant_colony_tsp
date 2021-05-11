@@ -1,4 +1,5 @@
-require 'json'
+require 'bundler/setup'
+Bundler.require
 require_relative "modules/databaseable"
 require_relative "ant/ant"
 require_relative "ant/vertex_preference_generator"
@@ -9,14 +10,13 @@ require_relative "utils/rand_gen"
 
 class AntColonyTsp
 	attr_reader :time
-	DEFAULT_NUM_ANTS = 20
-	DEFAULT_NUM_ITERATIONS = 100
+	DEFAULT_NUM_ITERATIONS = 50
+	DEFAULT_NUM_ANTS = 30
 	ALPHA_VALUE = 1
 	INITIAL_TRAIL_DENSITY = 0.05
 	BETA_VALUE = 1
 	Q = 100
 	RHO = 0.8
-	NUM_ITERATIONS = 20
 
 	def initialize(edge_inputs:, vertex_inputs:, graph_class:, vertex_class:, edge_class:, ant_class:, rand_gen:, num_iterations:, num_ants:)
 		@ant_class = ant_class
@@ -68,7 +68,7 @@ class AntColonyTsp
 		global_shortest_path_edges = nil
 		global_shortest_path_length = Float::INFINITY
 
-		for iteration_count in 0..NUM_ITERATIONS - 1
+		for iteration_count in 0..@num_iterations - 1
 			@ant_class.all.each do |ant|
 				# make every ant execute one tour
 				for i in 0..@num_vertices - 2
@@ -115,8 +115,10 @@ class AntColonyTsp
 
 	def self.drive_test
 		start_time = Time.now
-		edges_file = File.read(__dir__ + "/utils/test_data/test_edge_inputs.json")
-		vertices_file = File.read(__dir__ + "/utils/test_data/test_vertex_inputs.json")
+		edges_file_path = File.expand_path("../data/constant_difficulty/test_edge_inputs.json", __dir__)
+		vertices_file_path = File.expand_path("../data/constant_difficulty/test_vertex_inputs.json", __dir__)
+		edges_file = File.read(edges_file_path)
+		vertices_file = File.read(vertices_file_path)
 		edge_inputs = JSON.parse(edges_file)
 		vertex_inputs = JSON.parse(vertices_file)
 		end_time = Time.now
@@ -138,7 +140,8 @@ class AntColonyTsp
 		# end
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"
-		true
+
+		result
 	end
 
 	private
