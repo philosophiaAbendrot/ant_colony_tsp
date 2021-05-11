@@ -64,7 +64,8 @@ class AntColonyTsp
 		# initialize ants and place them on random vertices
 		initialize_ants
 		iteration_count = 0
-		global_shortest_path = nil
+		global_shortest_path_vertices = nil
+		global_shortest_path_edges = nil
 		global_shortest_path_length = Float::INFINITY
 
 		for iteration_count in 0..NUM_ITERATIONS - 1
@@ -77,12 +78,14 @@ class AntColonyTsp
 
 			# find ant with shortest path
 			ant_with_shortest_path = nil
-			shortest_path = nil
+			shortest_path_edges = nil
 			shortest_path_length = Float::INFINITY
+			shortest_path_vertices = nil
 
 			@ant_class.all.each do |ant|
 				if (path_length = ant.find_path_length) < shortest_path_length
-					shortest_path = ant.visited_edge_ids
+					shortest_path_edges = ant.visited_edge_ids
+					shortest_path_vertices = ant.visited_vertex_ids
 					shortest_path_length = path_length
 					ant_with_shortest_path = ant
 				end
@@ -100,13 +103,14 @@ class AntColonyTsp
 			# update global shortest path
 			if shortest_path_length < global_shortest_path_length
 				global_shortest_path_length = shortest_path_length
-				global_shortest_path = shortest_path
+				global_shortest_path_edges = shortest_path_edges
+				global_shortest_path_vertices = shortest_path_vertices
 			end
 
 			puts "i:#{iteration_count} shortest path length = #{shortest_path_length}"
 		end
 
-		[global_shortest_path, global_shortest_path_length]
+		{ vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length }
 	end
 
 	def self.drive_test
@@ -120,10 +124,11 @@ class AntColonyTsp
 
 		# convert edges and vertices keys to symbols
 		start_time = Time.now
-		shortest_path, shortest_path_length = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
 
-		puts "global shortest path found = #{shortest_path}"
-		puts "global shortest path length = #{shortest_path_length}"
+		puts "shortest path edges = #{result[:edges]}"
+		puts "shortest path vertices = #{result[:vertices]}"
+		puts "shortest path length = #{result[:path_length]}"
 
 		end_time = Time.now
 
