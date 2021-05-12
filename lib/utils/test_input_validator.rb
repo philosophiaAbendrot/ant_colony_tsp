@@ -1,4 +1,5 @@
 require 'json'
+require 'test_input_generator'
 
 class TestInputValidator
 	def initialize(vertex_inputs, edge_inputs)
