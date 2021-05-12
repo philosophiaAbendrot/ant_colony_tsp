@@ -107,10 +107,18 @@ class AntColonyTsp
 				global_shortest_path_vertices = shortest_path_vertices
 			end
 
+			edges_data = {}
+
+			@edge_class.all.each do |edge|
+				edges_data[edge.id] = { start_vertex_id: edge.start_vertex_id, end_vertex_id: edge.end_vertex_id,
+																cost_of_traversal: edge.cost_of_traversal, trail_density: edge.trail_density }
+			end
+
+
 			puts "i:#{iteration_count} shortest path length = #{shortest_path_length}"
 		end
 
-		{ vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length }
+		{ vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length, edges_data: edges_data }
 	end
 
 	def self.drive_test
@@ -141,7 +149,7 @@ class AntColonyTsp
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"
 
-		result
+		true
 	end
 
 	private

@@ -1,5 +1,4 @@
 require 'json'
-require 'test_input_generator'
 
 class TestInputValidator
 	def initialize(vertex_inputs, edge_inputs)
@@ -9,8 +8,8 @@ class TestInputValidator
 		end_time = Time.now
 	end
 
-	def self.execute
-		new.execute
+	def self.execute(vertices:, edges:)
+		new(vertices, edges).execute
 		true
 	end
 
