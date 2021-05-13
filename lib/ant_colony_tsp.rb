@@ -18,7 +18,11 @@ class AntColonyTsp
 	Q = 100
 	RHO = 0.8
 
-	def initialize(edge_inputs:, vertex_inputs:, graph_class:, vertex_class:, edge_class:, ant_class:, rand_gen:, num_iterations:, num_ants:)
+	def initialize(edge_inputs:, vertex_inputs:, graph_class:,
+								 vertex_class:, edge_class:, ant_class:,
+								 rand_gen:, num_iterations:, num_ants:,
+								 include_edges_data:,
+								 include_path_length_vs_iteration:)
 		@ant_class = ant_class
 		@graph_class = graph_class
 		@vertex_class = vertex_class
@@ -30,6 +34,8 @@ class AntColonyTsp
 		@initial_trail_density = INITIAL_TRAIL_DENSITY
 		@edge_inputs = edge_inputs
 		@vertex_inputs = vertex_inputs
+		@include_edges_data = include_edges_data
+		@include_path_length_vs_iteration = include_path_length_vs_iteration
 
 		@time = 0
 
@@ -43,19 +49,17 @@ class AntColonyTsp
 									 ant_class: Ant::Ant,
 									 rand_gen: Utils::RandGen,
 									 num_ants: DEFAULT_NUM_ANTS,
-									 num_iterations: DEFAULT_NUM_ITERATIONS)
+									 num_iterations: DEFAULT_NUM_ITERATIONS,
+									 include_edges_data: false,
+									 include_path_length_vs_iteration: false)
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
 	
-		new(edge_inputs: edge_inputs,
-				vertex_inputs: vertex_inputs,
-				graph_class: graph_class,
-				vertex_class: vertex_class,
-				edge_class: edge_class,
-				ant_class: ant_class,
-				rand_gen: rand_gen,
-				num_ants: num_ants,
-				num_iterations: num_iterations).execute
+		new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, graph_class: graph_class,
+				vertex_class: vertex_class, edge_class: edge_class, ant_class: ant_class,
+				rand_gen: rand_gen, num_ants: num_ants, num_iterations: num_iterations,
+				include_edges_data: include_edges_data,
+				include_path_length_vs_iteration: include_path_length_vs_iteration).execute
 	end
 
 	def execute
@@ -67,6 +71,7 @@ class AntColonyTsp
 		global_shortest_path_vertices = nil
 		global_shortest_path_edges = nil
 		global_shortest_path_length = Float::INFINITY
+		iteration_path_lengths = []
 
 		for iteration_count in 0..@num_iterations - 1
 			@ant_class.all.each do |ant|
@@ -107,6 +112,12 @@ class AntColonyTsp
 				global_shortest_path_vertices = shortest_path_vertices
 			end
 
+			iteration_path_lengths << shortest_path_length if @include_path_length_vs_iteration
+		end
+
+		output = { vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length }
+
+		if @include_edges_data
 			edges_data = {}
 
 			@edge_class.all.each do |edge|
@@ -114,11 +125,11 @@ class AntColonyTsp
 																cost_of_traversal: edge.cost_of_traversal, trail_density: edge.trail_density }
 			end
 
-
-			puts "i:#{iteration_count} shortest path length = #{shortest_path_length}"
+			output.merge!(edges_data: edges_data)
 		end
 
-		{ vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length, edges_data: edges_data }
+		output.merge!(iteration_path_lengths: iteration_path_lengths) if @include_path_length_vs_iteration
+		output
 	end
 
 	def self.drive_test
@@ -134,7 +145,7 @@ class AntColonyTsp
 
 		# convert edges and vertices keys to symbols
 		start_time = Time.now
-		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, include_edges_data: true, include_path_length_vs_iteration: true)
 
 		puts "shortest path edges = #{result[:edges]}"
 		puts "shortest path vertices = #{result[:vertices]}"
@@ -149,7 +160,8 @@ class AntColonyTsp
 
 		puts "execution time: #{(end_time - start_time) * 1_000} ms"
 
-		true
+		# true
+		result
 	end
 
 	private
