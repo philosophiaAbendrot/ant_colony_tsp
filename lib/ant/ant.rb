@@ -2,22 +2,13 @@ module Ant
 	class Ant
 		extend Databaseable
 
-		@@q = nil
-
 		attr_accessor :current_vertex_id, :visited_vertex_ids, :visited_edge_ids
 
-		def initialize(current_vertex_id:, vertex_class:, id:, edge_class:, rand_gen: Utils::RandGen)
+		def initialize(current_vertex_id:, id:)
 			@id = id
 			@current_vertex_id = current_vertex_id
 			@visited_edge_ids = []
 			@visited_vertex_ids = [current_vertex_id]
-			@vertex_class = vertex_class
-			@edge_class = edge_class
-			@rand_gen = rand_gen
-		end
-
-		def self.set_pheromone_laying_rate(q)
-			@@q = q.to_f
 		end
 
 		def self.reset_to_original_position
@@ -29,8 +20,17 @@ module Ant
 			end
 		end
 
+		def self.configure(config)
+			@@vertex_class = config.vertex_class
+			@@edge_class = config.edge_class
+			@@rand_gen = config.rand_gen
+			@@q = config.q
+			@@alpha = config.alpha
+			@@beta = config.beta
+		end
+
 		def current_vertex
-			@vertex_class.find(@current_vertex_id)
+			@@vertex_class.find(@current_vertex_id)
 		end
 
 		def x_pos
@@ -44,14 +44,15 @@ module Ant
 		def move_to_next_vertex
 			# evaluate preferences
 
-			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @edge_class.find(edge_id) }
-			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges, visited_vertex_ids: @visited_vertex_ids.dup)
+			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @@edge_class.find(edge_id) }
+
+			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges, visited_vertex_ids: @visited_vertex_ids.dup, alpha: @@alpha, beta: @@beta)
 
 			# if there is no option to move to a vertex, terminate early and return false to indicate that no movement occurred
 
 			return false if cumulative_preferences.empty?
 
-			rand_num = @rand_gen.rand_float
+			rand_num = @@rand_gen.rand_float
 
 			selected_vertex_id = nil
 
@@ -76,13 +77,13 @@ module Ant
 		end
 
 		def find_path_length
-			@visited_edge_ids.map { |el| @edge_class.find(el).cost_of_traversal }.sum
+			@visited_edge_ids.map { |el| @@edge_class.find(el).cost_of_traversal }.sum
 		end
 
 		def lay_pheromones
 			trail_density = @@q / find_path_length
 
-			@visited_edge_ids.map { |el| @edge_class.find(el) }.each do |edge|
+			@visited_edge_ids.map { |el| @@edge_class.find(el) }.each do |edge|
 				edge.add_pheromones(trail_density)
 			end
 		end

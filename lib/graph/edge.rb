@@ -25,7 +25,7 @@ module Graph
 		def self.set_trail_densities(set_value)
 			# set trail density to a set value for all edges
 			all.each do |edge|
-				edge.trail_density = set_value.to_f
+				edge.trail_density = set_value
 			end
 		end
 

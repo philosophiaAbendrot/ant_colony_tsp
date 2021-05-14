@@ -1,18 +1,20 @@
 module Graph
 	class Graph
-		def initialize(edge_inputs:, vertex_inputs:, vertex_class:, edge_class:, initial_trail_density:, trail_persistence:)
-			@vertex_class = vertex_class
-			@edge_class = edge_class
+		def initialize(edge_inputs:, vertex_inputs:, config:)
+			@vertex_class = config.vertex_class
+			@edge_class = config.edge_class
+			@initial_trail_density = config.initial_trail_density
+			@rho = config.rho
 
 			# initialize edges and Vertices
-			initialize_edges(edge_inputs, initial_trail_density, trail_persistence)
+			initialize_edges(edge_inputs)
 			initialize_vertices(vertex_inputs)
 			connect_edges_with_vertices
 		end
 
 		private 
 
-		def initialize_edges(edge_inputs, trail_density, trail_persistence)
+		def initialize_edges(edge_inputs)
 			# edge input format
 			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
 
@@ -30,9 +32,9 @@ module Graph
 			end
 
 			# set initial trail densities
-			@edge_class.set_trail_densities(trail_density)
+			@edge_class.set_trail_densities(@trail_density)
 			# set trail persistence
-			@edge_class.set_trail_persistence(trail_persistence)
+			@edge_class.set_trail_persistence(@rho)
 		end
 
 		def initialize_vertices(vertex_inputs)

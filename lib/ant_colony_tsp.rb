@@ -7,56 +7,51 @@ require_relative "graph/graph"
 require_relative "graph/edge"
 require_relative "graph/vertex"
 require_relative "utils/rand_gen"
+require_relative "config"
 
 class AntColonyTsp
 	attr_reader :time
-	DEFAULT_NUM_ITERATIONS = 50
-	DEFAULT_NUM_ANTS = 30
-	ALPHA_VALUE = 1
-	INITIAL_TRAIL_DENSITY = 0.05
-	BETA_VALUE = 1
-	Q = 100
-	RHO = 0.8
 
-	def initialize(edge_inputs:, vertex_inputs:, graph_class:,
-								 vertex_class:, edge_class:, ant_class:,
-								 rand_gen:,
+	def initialize(edge_inputs:, vertex_inputs:,
 								 include_edges_data:,
 								 include_path_length_vs_iteration:)
-		@ant_class = ant_class
-		@graph_class = graph_class
-		@vertex_class = vertex_class
-		@edge_class = edge_class
-		@rand_gen = rand_gen
-		@num_ants = DEFAULT_NUM_ANTS
+
+		@config = AntColonyTsp.config
 		@num_vertices = vertex_inputs.length
-		@initial_trail_density = INITIAL_TRAIL_DENSITY
 		@edge_inputs = edge_inputs
 		@vertex_inputs = vertex_inputs
 		@include_edges_data = include_edges_data
 		@include_path_length_vs_iteration = include_path_length_vs_iteration
-		@num_iterations = DEFAULT_NUM_ITERATIONS
-
 		@time = 0
+
+		@num_ants = @config.num_ants
+		@ant_class = @config.ant_class
+		@graph_class = @config.graph_class
+		@vertex_class = @config.vertex_class
+		@edge_class = @config.edge_class
+		@rand_gen = @config.rand_gen
+		@num_iterations = @config.num_iterations
 
 		true
 	end
 
+	def self.config
+		@@config ||= Config.new
+		@@config
+	end
+
+	def self.configure(&block)
+		block.call(self.config)
+		self.config.process_configs
+	end
+
 	def self.execute(edge_inputs:, vertex_inputs:,
-									 graph_class: Graph::Graph,
-									 vertex_class: Graph::Vertex,
-									 edge_class: Graph::Edge,
-									 ant_class: Ant::Ant,
-									 rand_gen: Utils::RandGen,
 									 include_edges_data: false,
 									 include_path_length_vs_iteration: false)
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
 		vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
-	
-		new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, graph_class: graph_class,
-				vertex_class: vertex_class, edge_class: edge_class, ant_class: ant_class,
-				rand_gen: rand_gen,
-				include_edges_data: include_edges_data,
+
+		new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, include_edges_data: include_edges_data,
 				include_path_length_vs_iteration: include_path_length_vs_iteration).execute
 	end
 
@@ -143,6 +138,7 @@ class AntColonyTsp
 
 		# convert edges and vertices keys to symbols
 		start_time = Time.now
+
 		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, include_edges_data: true, include_path_length_vs_iteration: true)
 
 		puts "shortest path edges = #{result[:edges]}"
@@ -174,18 +170,17 @@ class AntColonyTsp
 	end
 
 	def initialize_graph
-		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs, vertex_class: @vertex_class, edge_class: @edge_class, initial_trail_density: @initial_trail_density, trail_persistence: RHO)
+		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs, config: @config)
 	end
 
 	def initialize_ants
 		ant_id = 1
+		@ant_class.configure(@config)
 
 		@num_ants.times do
 			rand_num = @rand_gen.rand_int(@vertex_class.all.length)
-			@ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, vertex_class: @vertex_class, id: ant_id, edge_class: @edge_class)
+			@ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, id: ant_id)
 			ant_id += 1
 		end
-
-		@ant_class.set_pheromone_laying_rate(Q)
 	end
 end
