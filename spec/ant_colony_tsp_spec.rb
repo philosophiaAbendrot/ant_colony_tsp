@@ -10,8 +10,11 @@ describe AntColonyTsp do
 	let(:ant_class) { Ant::Ant }
 	let(:rand_gen_double) { class_double("Utils::RandGen") }
 	let(:num_ants) { AntColonyTsp::DEFAULT_NUM_ANTS }
-	let(:num_iterations) { AntColonyTsp::DEFAULT_NUM_ITERATIONS }
 	let(:instance) { initialize_ant_colony_tsp }
+	let(:include_edges_data) { false }
+	let(:include_path_length_vs_iteration) { false }
+	let(:initial_trail_density) { AntColonyTsp::INITIAL_TRAIL_DENSITY }
+	let(:trail_persistence) { AntColonyTsp::RHO }
 
 	before(:each) do
 		allow(ant_class).to receive(:all).and_return(Array.new(AntColonyTsp::DEFAULT_NUM_ANTS) { double("ant_element", id: 5) })
@@ -31,8 +34,8 @@ describe AntColonyTsp do
 						edge_class: edge_class,
 						ant_class: ant_class,
 						rand_gen: rand_gen_double,
-						num_ants: num_ants,
-						num_iterations: num_iterations)
+						include_edges_data: include_edges_data,
+						include_path_length_vs_iteration: include_path_length_vs_iteration)
 	end
 
 	describe "initialize" do
@@ -41,7 +44,10 @@ describe AntColonyTsp do
 
 			it "should call initialize on provided Graph class with the correct parameters" do
 				instance = initialize_ant_colony_tsp
-				expect(graph_class).to receive(:new).with(hash_including(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge))
+				expect(graph_class).to receive(:new).with(hash_including(edge_inputs: edge_params, vertex_inputs: vertex_params,
+																																 vertex_class: vertex_class, edge_class: edge_class,
+																																 initial_trail_density: initial_trail_density,
+																																 trail_persistence: trail_persistence))
 				instance.send(:initialize_graph)
 			end
 		end

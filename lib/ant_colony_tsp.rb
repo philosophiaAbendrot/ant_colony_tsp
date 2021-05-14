@@ -20,7 +20,7 @@ class AntColonyTsp
 
 	def initialize(edge_inputs:, vertex_inputs:, graph_class:,
 								 vertex_class:, edge_class:, ant_class:,
-								 rand_gen:, num_iterations:, num_ants:,
+								 rand_gen:,
 								 include_edges_data:,
 								 include_path_length_vs_iteration:)
 		@ant_class = ant_class
@@ -28,14 +28,14 @@ class AntColonyTsp
 		@vertex_class = vertex_class
 		@edge_class = edge_class
 		@rand_gen = rand_gen
-		@num_ants = num_ants
-		@num_iterations = num_iterations
+		@num_ants = DEFAULT_NUM_ANTS
 		@num_vertices = vertex_inputs.length
 		@initial_trail_density = INITIAL_TRAIL_DENSITY
 		@edge_inputs = edge_inputs
 		@vertex_inputs = vertex_inputs
 		@include_edges_data = include_edges_data
 		@include_path_length_vs_iteration = include_path_length_vs_iteration
+		@num_iterations = DEFAULT_NUM_ITERATIONS
 
 		@time = 0
 
@@ -48,8 +48,6 @@ class AntColonyTsp
 									 edge_class: Graph::Edge,
 									 ant_class: Ant::Ant,
 									 rand_gen: Utils::RandGen,
-									 num_ants: DEFAULT_NUM_ANTS,
-									 num_iterations: DEFAULT_NUM_ITERATIONS,
 									 include_edges_data: false,
 									 include_path_length_vs_iteration: false)
 		edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
@@ -57,7 +55,7 @@ class AntColonyTsp
 	
 		new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, graph_class: graph_class,
 				vertex_class: vertex_class, edge_class: edge_class, ant_class: ant_class,
-				rand_gen: rand_gen, num_ants: num_ants, num_iterations: num_iterations,
+				rand_gen: rand_gen,
 				include_edges_data: include_edges_data,
 				include_path_length_vs_iteration: include_path_length_vs_iteration).execute
 	end
