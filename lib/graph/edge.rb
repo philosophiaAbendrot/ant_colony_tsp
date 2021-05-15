@@ -15,9 +15,14 @@ module Graph
 			@delta_trail_density = 0.0
 		end
 
+		def self.initialize_trail_densities
+			set_trail_densities(@@initial_trail_density)
+		end
+
 		def self.set_config(config)
 			@@vertex_class = config.vertex_class
 			@@rho = config.rho
+			@@initial_trail_density = config.initial_trail_density
 		end
 
 		def self.set_trail_densities(set_value)
