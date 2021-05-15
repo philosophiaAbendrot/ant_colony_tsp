@@ -6,19 +6,28 @@ describe Ant::Ant do
 	let(:current_vertex_id) { 5 }
 	let!(:current_vertex) { Graph::Vertex.new(x_pos: -5, y_pos: 3, id: current_vertex_id) }
 	let(:ant_id) { 1 }
-	let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, edge_class: Graph::Edge, id: ant_id } }
+	let(:config) { Config.new.process_configs }
+	let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 	let(:ant) { Ant::Ant.find(ant_id) }
 
 	before(:each) do
-		Ant::Ant.new(initialize_params)
+		Graph::Graph.set_config(config)
+		Graph::Edge.set_config(config)
+		Ant::Ant.set_config(config)
 	end
 
 	after(:each) do
 		Ant::Ant.destroy_all
 		Graph::Vertex.destroy_all
+		Graph::Edge.destroy_all
 	end
 
 	describe "initialize" do
+		before(:each) do
+			Ant::Ant.set_config(config)
+			Ant::Ant.new(initialize_params)
+		end
+
 		it "ant should be initialized" do
 			expect(ant).to_not be nil
 		end
@@ -37,18 +46,30 @@ describe Ant::Ant do
 	end
 
 	describe "current_vertex" do
+		before(:each) do
+			Ant::Ant.new(initialize_params)
+		end
+
 		it "should return the vertex associated with the Ant instance" do
 			expect(ant.current_vertex).to eq current_vertex
 		end
 	end
 
 	describe "x_pos" do
+		before(:each) do
+			Ant::Ant.new(initialize_params)
+		end
+
 		it "should return the x_pos of the current_vertex" do
 			expect(ant.x_pos).to eq current_vertex.x_pos
 		end
 	end
 
 	describe "y_pos" do
+		before(:each) do
+			Ant::Ant.new(initialize_params)
+		end
+
 		it "should return the y_pos of the current_vertex" do
 			expect(ant.y_pos).to eq current_vertex.y_pos
 		end
@@ -59,19 +80,21 @@ describe Ant::Ant do
 		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6], [4, 9.5, 5]] }
 		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
 		let(:edge_inputs) { [[1, 4.6, 1, 3], [2, 9.5, 1, 4], [3, 7.3, 1, 2]] }
-		let(:default_pheromone_density) { 3 }
 
 		let(:mock_rand_gen) { double("rand_gen", rand_float: 0.5) }
-		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: Graph::Edge, rand_gen: mock_rand_gen } }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
 		before(:each) do
+			config.rand_gen = mock_rand_gen
+			config.process_configs
+			Ant::Ant.set_config(config)
+
 			generate_vertices(vertex_inputs)
-			generate_edges(edge_inputs, default_pheromone_density)
+			generate_edges(edge_inputs, config.initial_trail_density)
 
 			# set up connections on the vertex the ant is on
-			vertex_1 = Graph::Vertex.find(1)
-			vertex_1.outgoing_edge_ids = [1, 2, 3]
-
+			Ant::Ant.new(initialize_params)
+			Graph::Vertex.find(1).outgoing_edge_ids = [1, 2, 3]
 			ant.current_vertex_id = 1
 			ant.visited_vertex_ids = [1]
 		end
@@ -144,16 +167,16 @@ describe Ant::Ant do
 		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
 		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
 		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
-		let(:default_pheromone_density) { 3 }
-		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: Graph::Edge, rand_gen: Utils::RandGen } }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
 		before(:each) do
 			generate_vertices(vertex_inputs)
-			generate_edges(edge_inputs, default_pheromone_density)
+			generate_edges(edge_inputs, config.initial_trail_density)
+
+			Ant::Ant.new(initialize_params)
 
 			# set up connections on the vertex the ant is on
-			vertex_1 = Graph::Vertex.find(1)
-			vertex_1.outgoing_edge_ids = [1, 2, 3]
+			Graph::Vertex.find(1).outgoing_edge_ids = [1, 2, 3]
 
 			ant.current_vertex_id = 1
 			ant.visited_vertex_ids = [1, 2, 3]
@@ -175,13 +198,19 @@ describe Ant::Ant do
 		let(:mock_edge_1) { double("edge1", cost_of_traversal: 5.3) }
 		let(:mock_edge_2) { double("edge2", cost_of_traversal: 7.0) }
 		let(:mock_edge_3) { double("edge3", cost_of_traversal: 1.1) }
-		let(:default_pheromone_density) { 3 }
-		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: mock_edge_class, rand_gen: Utils::RandGen } }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 		let(:q) { 5 }
 
 		before(:each) do
+			config.q = q
+			config.edge_class = mock_edge_class
+			config.process_configs
+
+			Ant::Ant.set_config(config)
+			Ant::Ant.new(initialize_params)
+
 			generate_vertices(vertex_inputs)
-			generate_edges(edge_inputs, default_pheromone_density)
+			generate_edges(edge_inputs, config.initial_trail_density)
 
 			allow(mock_edge_class).to receive(:find).with(1).and_return(mock_edge_1)
 			allow(mock_edge_class).to receive(:find).with(2).and_return(mock_edge_2)
@@ -197,7 +226,6 @@ describe Ant::Ant do
 		end
 
 		it "should call add_pheromones with delta value Q/Lk on each edge" do
-			Ant::Ant.set_pheromone_laying_rate(q)
 			expected_density = q.to_f / ant.find_path_length
 			expect(mock_edge_1).to receive(:add_pheromones).with(expected_density)
 			expect(mock_edge_2).to receive(:add_pheromones).with(expected_density)
@@ -211,12 +239,13 @@ describe Ant::Ant do
 		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
 		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
 		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
-		let(:default_pheromone_density) { 3 }
-		let(:initialize_params) { { current_vertex_id: current_vertex_id, vertex_class: Graph::Vertex, id: ant_id, edge_class: Graph::Edge, rand_gen: Utils::RandGen } }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
 		before(:each) do
 			generate_vertices(vertex_inputs)
-			generate_edges(edge_inputs, default_pheromone_density)
+			generate_edges(edge_inputs, config.initial_trail_density)
+
+			Ant::Ant.new(initialize_params)
 
 			# set up connections on the vertex the ant is on
 			vertex_1 = Graph::Vertex.find(1)

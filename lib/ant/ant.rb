@@ -20,7 +20,7 @@ module Ant
 			end
 		end
 
-		def self.configure(config)
+		def self.set_config(config)
 			@@vertex_class = config.vertex_class
 			@@edge_class = config.edge_class
 			@@rand_gen = config.rand_gen

@@ -32,6 +32,11 @@ class AntColonyTsp
 		@rand_gen = @config.rand_gen
 		@num_iterations = @config.num_iterations
 
+		# pass configuration to model classes
+		@edge_class.set_config(@config)
+		@graph_class.set_config(@config)
+		@ant_class = @ant_class.set_config(@config)
+
 		true
 	end
 
@@ -175,8 +180,6 @@ class AntColonyTsp
 
 	def initialize_ants
 		ant_id = 1
-		@ant_class.configure(@config)
-
 		@num_ants.times do
 			rand_num = @rand_gen.rand_int(@vertex_class.all.length)
 			@ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, id: ant_id)

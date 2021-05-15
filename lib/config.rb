@@ -2,9 +2,6 @@ class Config
 	attr_accessor :num_ants, :num_iterations, :rho, :alpha, :beta, :initial_trail_density, :q,
 								:vertex_class, :edge_class, :ant_class, :rand_gen, :graph_class
 
-	TEST_MODE = "test"
-	LIVE_MODE = "live"
-
 	def initialize
 		# set default values which user can override
 		@num_ants = 30
@@ -19,6 +16,7 @@ class Config
 		@graph_class = Graph::Graph
 		@ant_class = Ant::Ant
 		@rand_gen = Utils::RandGen
+
 	end
 
 	def process_configs
@@ -27,5 +25,6 @@ class Config
 		@beta = @beta.to_f
 		@initial_trail_density = @initial_trail_density.to_f
 		@q = @q.to_f
+		self
 	end
 end

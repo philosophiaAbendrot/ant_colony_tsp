@@ -1,15 +1,19 @@
 module Graph
 	class Graph
-		def initialize(edge_inputs:, vertex_inputs:, config:)
-			@vertex_class = config.vertex_class
-			@edge_class = config.edge_class
-			@initial_trail_density = config.initial_trail_density
-			@rho = config.rho
-
+		def initialize(edge_inputs:, vertex_inputs:)
 			# initialize edges and Vertices
 			initialize_edges(edge_inputs)
 			initialize_vertices(vertex_inputs)
 			connect_edges_with_vertices
+		end
+
+		def self.set_config(config)
+			@@config = config
+
+			@@vertex_class = config.vertex_class
+			@@edge_class = config.edge_class
+			@@initial_trail_density = config.initial_trail_density
+			@@rho = config.rho
 		end
 
 		private 
@@ -22,19 +26,17 @@ module Graph
 
 
 			edge_inputs.each do |edge_input|
-				edge_input.merge!(vertex_class: @vertex_class)
-
 				if edge_input.is_a?(Hash)
-					@edge_class.new(edge_input)
+					@@edge_class.new(edge_input)
 				else
 					raise ArgumentError.new("Edge input is not in hash format")
 				end
 			end
 
 			# set initial trail densities
-			@edge_class.set_trail_densities(@trail_density)
+			@@edge_class.set_trail_densities(@trail_density)
 			# set trail persistence
-			@edge_class.set_trail_persistence(@rho)
+			@@edge_class.set_trail_persistence(@@rho)
 		end
 
 		def initialize_vertices(vertex_inputs)
@@ -45,7 +47,7 @@ module Graph
 
 			vertex_inputs.each do |vertex_input|
 				if vertex_input.is_a?(Hash)
-					@vertex_class.new(vertex_input)
+					@@vertex_class.new(vertex_input)
 				else
 					raise ArgumentError.new("Vertex input is not in hash format")
 				end
@@ -53,7 +55,7 @@ module Graph
 		end
 
 		def connect_edges_with_vertices
-			@edge_class.all.each do |edge|
+			@@edge_class.all.each do |edge|
 				edge.start_vertex.outgoing_edge_ids << edge.id
 				edge.end_vertex.incoming_edge_ids << edge.id
 			end
