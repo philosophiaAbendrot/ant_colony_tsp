@@ -34,9 +34,7 @@ module Graph
 			end
 
 			# set initial trail densities
-			@@edge_class.set_trail_densities(@trail_density)
-			# set trail persistence
-			@@edge_class.set_trail_persistence(@@rho)
+			@@edge_class.set_trail_densities(@@initial_trail_density)
 		end
 
 		def initialize_vertices(vertex_inputs)

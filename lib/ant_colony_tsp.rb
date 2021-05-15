@@ -16,7 +16,6 @@ class AntColonyTsp
 								 include_edges_data:,
 								 include_path_length_vs_iteration:)
 
-		@config = AntColonyTsp.config
 		@num_vertices = vertex_inputs.length
 		@edge_inputs = edge_inputs
 		@vertex_inputs = vertex_inputs
@@ -24,18 +23,20 @@ class AntColonyTsp
 		@include_path_length_vs_iteration = include_path_length_vs_iteration
 		@time = 0
 
-		@num_ants = @config.num_ants
-		@ant_class = @config.ant_class
-		@graph_class = @config.graph_class
-		@vertex_class = @config.vertex_class
-		@edge_class = @config.edge_class
-		@rand_gen = @config.rand_gen
-		@num_iterations = @config.num_iterations
+		config = AntColonyTsp.config
+
+		@num_ants = config.num_ants
+		@ant_class = config.ant_class
+		@graph_class = config.graph_class
+		@vertex_class = config.vertex_class
+		@edge_class = config.edge_class
+		@rand_gen = config.rand_gen
+		@num_iterations = config.num_iterations
 
 		# pass configuration to model classes
-		@edge_class.set_config(@config)
-		@graph_class.set_config(@config)
-		@ant_class = @ant_class.set_config(@config)
+		@edge_class.set_config(config)
+		@graph_class.set_config(config)
+		@ant_class.set_config(config)
 
 		true
 	end
@@ -175,7 +176,7 @@ class AntColonyTsp
 	end
 
 	def initialize_graph
-		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs, config: @config)
+		@graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
 	end
 
 	def initialize_ants

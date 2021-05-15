@@ -2,9 +2,6 @@ module Graph
 	class Edge
 		extend Databaseable
 
-		@@config = nil
-		@@rho = nil
-
 		attr_accessor :trail_density, :delta_trail_density
 
 		attr_reader :id, :start_vertex_id, :end_vertex_id, :cost_of_traversal
@@ -20,10 +17,7 @@ module Graph
 
 		def self.set_config(config)
 			@@vertex_class = config.vertex_class
-		end
-
-		def self.set_trail_persistence(rho)
-			@@rho = rho.to_f
+			@@rho = config.rho
 		end
 
 		def self.set_trail_densities(set_value)
