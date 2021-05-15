@@ -8,30 +8,6 @@ require_relative "../support/test_input_generator/test_input_generator"
 describe AntColonyTsp, type: :feature do
 	let(:include_edges_data) { false }
 	let(:include_path_length_vs_iteration) { false }
-	let(:initial_trail_density) { AntColonyTsp::INITIAL_TRAIL_DENSITY }
-	let(:trail_persistence) { AntColonyTsp::RHO }
-
-	before(:each) do
-		allow(ant_class).to receive(:all).and_return(Array.new(AntColonyTsp::DEFAULT_NUM_ANTS) { double("ant_element", id: 5) })
-		allow(rand_gen_double).to receive(:rand_int).and_return(vertex_params.length - 1)
-	end
-
-	after(:each) do
-		Graph::Edge.destroy_all
-		Graph::Vertex.destroy_all
-	end
-	
-	def initialize_ant_colony_tsp
-		AntColonyTsp.new(edge_inputs: edge_params,
-						vertex_inputs: vertex_params,
-						graph_class: graph_class,
-						vertex_class: vertex_class,
-						edge_class: edge_class,
-						ant_class: ant_class,
-						rand_gen: rand_gen_double,
-						include_edges_data: include_edges_data,
-						include_path_length_vs_iteration: include_path_length_vs_iteration)
-	end
 
 	def read_inputs_from_file
 		edges_file_path = File.expand_path("../data/constant_difficulty/test_edge_inputs.json", __dir__)
@@ -42,35 +18,51 @@ describe AntColonyTsp, type: :feature do
 		vertex_inputs = JSON.parse(vertices_file)
 	end
 
-	def generate_inputs(num_vertices)
-		# generate inputs by using input generator class
-		TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
-	end
-
 	describe "running test with small data set" do
-		before(:all) do
-			generate_inputs(5)
+		let(:num_vertices) { 5 }
+		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
+		let(:edge_inputs) { generated_inputs[1] }
+		let(:vertex_inputs) { generated_inputs[0] }
+		let(:result) { AntColonyTsp.execute(edge_inputs: edge_inputs,
+																				vertex_inputs: vertex_inputs,
+																				include_edges_data: include_edges_data,
+																				include_path_length_vs_iteration: include_path_length_vs_iteration) }
+
+		it "the returned vertex list should have the same length as the number of input vertices" do
+			expect(result[:vertices].length).to eq(num_vertices)
 		end
-	end
 
-	def drive_test(edge_inputs, vertex_inputs)
-		# convert edges and vertices keys to symbols
-		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, include_edges_data: true, include_path_length_vs_iteration: true)
+		it "the returned vertex list should include every vertex id in the input" do
+			vertex_ids = vertex_inputs.map { |el| el[:id] }
+			expect(result[:vertices].sort).to eq(vertex_ids.sort)
+		end
 
-		puts "shortest path edges = #{result[:edges]}"
-		puts "shortest path vertices = #{result[:vertices]}"
-		puts "shortest path length = #{result[:path_length]}"
+		it "should return a list of edge ids, all of which are included in the edges input" do
+			edge_ids = edge_inputs.map { |el| el[:id] }
 
-		end_time = Time.now
+			for edge_id in result[:edges]
+				expect(edge_ids.include?(edge_id)).to be true
+			end
+		end
 
-		# printout results
-		# Ant::Ant.all.each do |ant|
-		# 	puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.find_path_length}"
-		# end
+		it "there should be num_vertices - 1 edges in the returned edge list" do
+			expect(result[:edges].length).to eq(num_vertices - 1)
+		end
 
-		puts "execution time: #{(end_time - start_time) * 1_000} ms"
+		it "path length should equal the sum of the cost of traversals of the returned edge list" do
+			path_edge_ids = result[:edges]
+			expected_path_length = 0
 
-		# true
-		result
+			for edge_input in edge_inputs
+				if path_edge_ids.include?(edge_input[:id])
+					expected_path_length += edge_input[:cost_of_traversal]
+				end
+			end
+
+			diff = (expected_path_length - result[:path_length]).abs
+			percent_diff = diff / ((expected_path_length + result[:path_length]) / 2.0) * 100
+
+			expect(percent_diff < 0.1).to be true
+		end
 	end
 end

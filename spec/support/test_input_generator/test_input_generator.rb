@@ -1,15 +1,12 @@
 require 'json'
-require_relative "../test_input_validator"
-require_relative "base_graph_generator"
-require_relative "incomplete_graph_generator"
-require_relative "complete_graph_generator"
 
 module TestInputGenerator
 	class TestInputGenerator
-		def initialize(num_vertices:, num_edges:, complete_graph:)
+		def initialize(num_vertices:, num_edges:, complete_graph:, write_to_file:)
 			@num_vertices = num_vertices
 			@num_edges = num_edges
-			@complete_graph = complete_graph
+
+			@write_to_file = write_to_file
 
 			if complete_graph
 				@graph_gen_instance = CompleteGraphGenerator.new(num_vertices: num_vertices)
@@ -18,35 +15,24 @@ module TestInputGenerator
 			end
 		end
 
-		def self.execute(complete_graph:, num_vertices:, num_edges: nil)
+		def self.execute(complete_graph:, num_vertices:, num_edges: nil, write_to_file: true)
 			start_time = Time.now
-
-			new(num_vertices: num_vertices, num_edges: num_edges, complete_graph: complete_graph).execute
+			result = new(num_vertices: num_vertices, num_edges: num_edges, complete_graph: complete_graph, write_to_file: write_to_file).execute
 			end_time = Time.now
-			puts "Time taken = #{(end_time - start_time) * 1000} ms"
-			true
+			result
 		end
 
 		def execute
 			start_time = Time.now
-			try_count = 1
-
-			loop do
-				vertex_outputs, edge_outputs = @graph_gen_instance.execute
-				write_results_to_file(vertex_outputs, edge_outputs)
-
-				if @complete_graph
-					valid = true
-				else
-					valid = TestInputValidator.execute(vertices: vertex_outputs, edges: edge_outputs)
-				end
-
-				break if valid
-				try_count += 1
-			end
+			vertex_outputs, edge_outputs = @graph_gen_instance.execute
 			end_time = Time.now
-
-			puts "Test inputs generated in #{try_count} attempts. Total execution time = #{(end_time - start_time) * 1000} ms"
+			
+			if @write_to_file
+				write_results_to_file(vertex_outputs, edge_outputs)
+				true
+			else
+				[vertex_outputs, edge_outputs]
+			end
 		end
 
 		private

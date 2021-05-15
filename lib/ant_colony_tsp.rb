@@ -131,39 +131,6 @@ class AntColonyTsp
 		output
 	end
 
-	def self.drive_test
-		start_time = Time.now
-		edges_file_path = File.expand_path("../data/constant_difficulty/test_edge_inputs.json", __dir__)
-		vertices_file_path = File.expand_path("../data/constant_difficulty/test_vertex_inputs.json", __dir__)
-		edges_file = File.read(edges_file_path)
-		vertices_file = File.read(vertices_file_path)
-		edge_inputs = JSON.parse(edges_file)
-		vertex_inputs = JSON.parse(vertices_file)
-		end_time = Time.now
-		puts "reading and parsing: #{(end_time - start_time) * 1_000} ms"
-
-		# convert edges and vertices keys to symbols
-		start_time = Time.now
-
-		result = execute(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs, include_edges_data: true, include_path_length_vs_iteration: true)
-
-		puts "shortest path edges = #{result[:edges]}"
-		puts "shortest path vertices = #{result[:vertices]}"
-		puts "shortest path length = #{result[:path_length]}"
-
-		end_time = Time.now
-
-		# printout results
-		# Ant::Ant.all.each do |ant|
-		# 	puts "#{ant.visited_vertex_ids.length} || #{ant.visited_vertex_ids} || #{ant.find_path_length}"
-		# end
-
-		puts "execution time: #{(end_time - start_time) * 1_000} ms"
-
-		# true
-		result
-	end
-
 	private
 
 	def self.symbolize_keys(h)
