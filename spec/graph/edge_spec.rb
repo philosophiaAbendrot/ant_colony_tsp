@@ -2,8 +2,9 @@ require 'spec_helper'
 
 describe Graph::Edge do
 	describe "initialize" do
-		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5, vertex_class: Graph::Vertex } }
+		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5 } }
 		let(:edge) { Graph::Edge.find(edge_params[:id]) }
+		let(:config) { Config.new.process_configs }
 
 		before(:each) do
 			Graph::Edge.new(edge_params)
@@ -30,7 +31,7 @@ describe Graph::Edge do
 		it "should set trail densities to a set value for all edges" do
 			id = 1	
 			20.times do
-				params = { id: id, start_vertex_id: rand(30), end_vertex_id: rand(30), cost_of_traversal: 10 * rand, vertex_class: Graph::Vertex }
+				params = { id: id, start_vertex_id: rand(30), end_vertex_id: rand(30), cost_of_traversal: 10 * rand }
 				edge = Graph::Edge.new(params)
 				id += 1
 			end
@@ -45,7 +46,7 @@ describe Graph::Edge do
 	end
 
 	describe "add_pheromones" do
-		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5, vertex_class: Graph::Vertex } }
+		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5 } }
 		let(:edge) { Graph::Edge.find(edge_params[:id]) }
 
 		before(:each) do
@@ -64,8 +65,8 @@ describe Graph::Edge do
 	end
 
 	describe "update_trail_densities" do
-		let(:edge_params) { [{ id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5, vertex_class: Graph::Vertex },
-												{ id: 2, start_vertex_id: 3, end_vertex_id: 9, cost_of_traversal: 8.6, vertex_class: Graph::Vertex }] }
+		let(:edge_params) { [{ id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5 },
+												{ id: 2, start_vertex_id: 3, end_vertex_id: 9, cost_of_traversal: 8.6 }] }
 		let(:initial_density) { 3 }
 		let(:trail_persistence) { 0.7 }
 
