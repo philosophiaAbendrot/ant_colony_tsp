@@ -1,5 +1,4 @@
 require "spec_helper"
-# require File.expand_path("../support/test_input_generator/base_graph_generator", __dir__)
 require_relative "../support/test_input_generator/base_graph_generator"
 require_relative "../support/test_input_generator/complete_graph_generator"
 require_relative "../support/test_input_generator/incomplete_graph_generator"
@@ -18,7 +17,13 @@ describe AntColonyTsp, type: :feature do
 		vertex_inputs = JSON.parse(vertices_file)
 	end
 
-	describe "running test with small data set" do
+	after(:each) do
+		Graph::Vertex.destroy_all
+		Graph::Edge.destroy_all
+		Ant::Ant.destroy_all
+	end
+
+	describe "doing sanity checks on outputs with small input graphs" do
 		let(:num_vertices) { 5 }
 		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
 		let(:edge_inputs) { generated_inputs[1] }
@@ -63,6 +68,23 @@ describe AntColonyTsp, type: :feature do
 			percent_diff = diff / ((expected_path_length + result[:path_length]) / 2.0) * 100
 
 			expect(percent_diff < 0.1).to be true
+		end
+
+		context "when 'include_edges_data' is set to true" do
+			let(:include_edges_data) { true }
+
+			it "edges_data should have same length as input edges" do
+				expect(result[:edges_data].length).to eq(edge_inputs.length)
+			end
+
+			it "edges data should be equivalent to input edges" do
+				edge_data = result[:edges_data]
+
+				for input_edge in edge_inputs
+					edge_data_pair = edge_data[input_edge[:id]]
+					expect(edge_data_pair[:start_vertex_id]).to eq(input_edge[:start_vertex_id])
+				end
+			end
 		end
 	end
 end
