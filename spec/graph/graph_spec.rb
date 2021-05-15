@@ -5,6 +5,7 @@ describe Graph::Graph do
 		let(:edge_params) { [{ id: 1, start_vertex_id: 3, end_vertex_id: 4, cost_of_traversal: 5 },
 											 { id: 2, start_vertex_id: 4, end_vertex_id: 3, cost_of_traversal: 3 }] }
 		let(:vertex_params) { [{ id: 3, x_pos: 4, y_pos: 5 }, { id: 4, x_pos: 5.0, y_pos: 6.0 }] }
+		let(:config) { Config.new.process_configs }
 		let(:mock_vertex_class) { class_double("Graph::Vertex") }
 		let(:mock_edge_class) { class_double("Graph::Edge") }
 		let(:mock_vertex_instance_3) { double("vertex_3", outgoing_edge_ids: [], incoming_edge_ids: []) }
@@ -15,11 +16,25 @@ describe Graph::Graph do
 		let(:rho) { 0.7 }
 
 		def generate_graph_with_mock_classes
-			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: mock_vertex_class, edge_class: mock_edge_class, initial_trail_density: initial_trail_density, trail_persistence: rho)
+			config.edge_class = mock_edge_class
+			config.vertex_class = mock_vertex_class
+			config.initial_trail_density = initial_trail_density
+			config.rho = rho
+			config.process_configs
+			Graph::Graph.set_config(config)
+			Graph::Edge.set_config(config)
+
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params)
 		end
 
 		def generate_graph
-			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params, vertex_class: Graph::Vertex, edge_class: Graph::Edge, initial_trail_density: initial_trail_density, trail_persistence: rho)
+			config.initial_trail_density = initial_trail_density
+			config.rho = rho
+			config.process_configs
+			Graph::Graph.set_config(config)
+			Graph::Edge.set_config(config)
+
+			Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params)
 		end
 
 		before(:each) do
