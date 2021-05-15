@@ -1,10 +1,15 @@
 require 'spec_helper'
 
 describe Graph::Edge do
+	let(:config) { Config.new.process_configs }
+
+	before(:each) do
+		Graph::Edge.set_config(config)
+	end
+
 	describe "initialize" do
 		let(:edge_params) { { id: 1, start_vertex_id: 5, end_vertex_id: 8, cost_of_traversal: 4.5 } }
 		let(:edge) { Graph::Edge.find(edge_params[:id]) }
-		let(:config) { Config.new.process_configs }
 
 		before(:each) do
 			Graph::Edge.new(edge_params)
@@ -71,12 +76,16 @@ describe Graph::Edge do
 		let(:trail_persistence) { 0.7 }
 
 		before(:each) do
+			config.rho = trail_persistence
+			config.process_configs
+
+			Graph::Edge.set_config(config)
+
 			edge_params.each do |edge_param|
 				Graph::Edge.new(edge_param)
 			end
 
 			Graph::Edge.set_trail_densities(initial_density)
-			Graph::Edge.set_trail_persistence(trail_persistence)
 		end
 
 		it "should update the trail density on the edge" do
