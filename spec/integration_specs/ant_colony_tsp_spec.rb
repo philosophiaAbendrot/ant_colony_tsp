@@ -22,6 +22,21 @@ describe AntColonyTsp, type: :feature do
 		(observed_value - true_value) / true_value.to_f * 100
 	end
 
+	def generate_inputs(num_vertices)
+		TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
+	end
+
+	def find_exact_solution(edge_inputs, vertex_inputs)
+		ExactSolutionFinder.call(vertex_inputs, edge_inputs)
+	end
+
+	def run_ants(edge_inputs, vertex_inputs)
+		AntColonyTsp.execute(edge_inputs: edge_inputs,
+												 vertex_inputs: vertex_inputs,
+												 include_edges_data: include_edges_data,
+												 include_path_length_vs_iteration: include_path_length_vs_iteration)
+	end
+
 	after(:each) do
 		Graph::Vertex.destroy_all
 		Graph::Edge.destroy_all
@@ -71,8 +86,7 @@ describe AntColonyTsp, type: :feature do
 
 			diff = (expected_path_length - result[:path_length]).abs
 			percent_diff = diff / ((expected_path_length + result[:path_length]) / 2.0) * 100
-
-			expect(percent_diff < 0.1).to be true
+			expect(percent_diff).to be < 0.1
 		end
 
 		context "when 'include_edges_data' is set to true" do
@@ -103,23 +117,7 @@ describe AntColonyTsp, type: :feature do
 
 	describe "checking against exact solutions for small input graphs" do
 		let(:num_vertices) { 8 }
-		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
 		let(:num_tests) { 20 }
-
-		def generate_inputs(num_vertices)
-			TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
-		end
-
-		def find_exact_solution(edge_inputs, vertex_inputs)
-			ExactSolutionFinder.call(vertex_inputs, edge_inputs)
-		end
-
-		def run_ants(edge_inputs, vertex_inputs)
-			AntColonyTsp.execute(edge_inputs: edge_inputs,
-													 vertex_inputs: vertex_inputs,
-													 include_edges_data: include_edges_data,
-													 include_path_length_vs_iteration: include_path_length_vs_iteration)
-		end
 
 		# this test could theoretically fail very rarely
 		it "on average, should be within 10\% of exact solution" do
@@ -143,7 +141,37 @@ describe AntColonyTsp, type: :feature do
 
 			avg_percent_error = percent_errors.sum / percent_errors.length.to_f
 
-			expect(avg_percent_error < 10).to be true
+			expect(avg_percent_error).to be < 10
 		end
 	end
+
+	describe "checking that path lengths found for large graphs decay during iteration process" do
+		let(:num_vertices) { 50 }
+		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
+		let(:num_tests) { 10 }
+		let(:include_path_length_vs_iteration) { true }
+
+		it "path length should decay" do
+			puts "running large scale tests with AntColonyTsp"
+			initial_path_lengths = []
+			path_length_set = []
+
+			for i in 0..num_tests - 1
+				puts "running test #{i}"
+				vertex_inputs, edge_inputs = generate_inputs(num_vertices)
+				result = run_ants(edge_inputs, vertex_inputs)
+				initial_path_lengths << result[:iteration_path_lengths][0]
+				path_length_set << result[:path_length]
+			end
+
+			ratio = []
+
+			for i in 0..path_length_set.length - 1
+				ratio << initial_path_lengths[i] / path_length_set[i].to_f
+			end
+
+			mean_ratio = ratio.sum / ratio.length.to_f
+			expect(mean_ratio).to be > 1.8
+		end
+	end 
 end
