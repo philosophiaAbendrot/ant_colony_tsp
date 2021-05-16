@@ -75,12 +75,19 @@ class AntColonyTsp
 		for iteration_count in 0..@num_iterations - 1
 			@ant_class.all.each do |ant|
 				# make every ant execute one tour
+				completed = true
+
 				for i in 0..@num_vertices - 2
-					break unless ant.move_to_next_vertex
+					moved = ant.move_to_next_vertex
+
+					unless moved
+						completed = false
+						break
+					end
 				end
 
 				# move ant back to start position
-				ant.move_to_start
+				ant.move_to_start if completed
 			end
 
 			# find ant with shortest path
@@ -90,7 +97,8 @@ class AntColonyTsp
 			shortest_path_vertices = nil
 
 			@ant_class.all.each do |ant|
-				if (path_length = ant.find_path_length) < shortest_path_length
+				# if ant path is shorter than the currently shortest path and ant completed a full tour
+				if (path_length = ant.find_path_length) < shortest_path_length && (ant.visited_edge_ids.length == @num_vertices)
 					shortest_path_edges = ant.visited_edge_ids
 					shortest_path_vertices = ant.visited_vertex_ids
 					shortest_path_length = path_length
