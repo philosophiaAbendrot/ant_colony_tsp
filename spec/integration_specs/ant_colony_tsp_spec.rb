@@ -24,7 +24,7 @@ describe AntColonyTsp, type: :feature do
 	end
 
 	describe "doing sanity checks on outputs with small input graphs" do
-		let(:num_vertices) { 5 }
+		let(:num_vertices) { 10 }
 		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
 		let(:edge_inputs) { generated_inputs[1] }
 		let(:vertex_inputs) { generated_inputs[0] }
@@ -86,5 +86,21 @@ describe AntColonyTsp, type: :feature do
 				end
 			end
 		end
+
+		context "when include_path_length_vs_iteration is set to true" do
+			let(:include_path_length_vs_iteration) { true }
+
+			it "path length output should have same length as 'num_iterations' config variable" do
+				expect(result[:iteration_path_lengths].length).to eq(AntColonyTsp.config.num_iterations)
+			end
+		end
+	end
+
+	describe "checking against exact solutions for small input graphs" do
+		
+	end
+
+	describe "checking performance against large inputs" do
+		
 	end
 end
