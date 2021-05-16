@@ -78,6 +78,9 @@ class AntColonyTsp
 				for i in 0..@num_vertices - 2
 					break unless ant.move_to_next_vertex
 				end
+
+				# move ant back to start position
+				ant.move_to_start
 			end
 
 			# find ant with shortest path

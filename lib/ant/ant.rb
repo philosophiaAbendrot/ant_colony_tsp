@@ -76,6 +76,17 @@ module Ant
 			true
 		end
 
+		def move_to_start
+			start_vertex_id = @visited_vertex_ids[0]
+
+			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @@edge_class.find(edge_id) }
+			selected_edge_id = outgoing_edges.select { |edge| edge.end_vertex_id == start_vertex_id }.first.id
+
+			@current_vertex_id = start_vertex_id
+			@visited_vertex_ids << start_vertex_id
+			@visited_edge_ids << selected_edge_id
+		end
+
 		def find_path_length
 			@visited_edge_ids.map { |el| @@edge_class.find(el).cost_of_traversal }.sum
 		end

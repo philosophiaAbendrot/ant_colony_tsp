@@ -3,6 +3,7 @@ require_relative "../support/test_input_generator/base_graph_generator"
 require_relative "../support/test_input_generator/complete_graph_generator"
 require_relative "../support/test_input_generator/incomplete_graph_generator"
 require_relative "../support/test_input_generator/test_input_generator"
+require_relative "../support/exact_solution_finder"
 
 describe AntColonyTsp, type: :feature do
 	let(:include_edges_data) { false }
@@ -15,6 +16,10 @@ describe AntColonyTsp, type: :feature do
 		vertices_file = File.read(vertices_file_path)
 		edge_inputs = JSON.parse(edges_file)
 		vertex_inputs = JSON.parse(vertices_file)
+	end
+
+	def find_percent_error(true_value, observed_value)
+		(observed_value - true_value) / true_value.to_f * 100
 	end
 
 	after(:each) do
@@ -34,12 +39,12 @@ describe AntColonyTsp, type: :feature do
 																				include_path_length_vs_iteration: include_path_length_vs_iteration) }
 
 		it "the returned vertex list should have the same length as the number of input vertices" do
-			expect(result[:vertices].length).to eq(num_vertices)
+			expect(result[:vertices].length).to eq(num_vertices + 1)
 		end
 
 		it "the returned vertex list should include every vertex id in the input" do
 			vertex_ids = vertex_inputs.map { |el| el[:id] }
-			expect(result[:vertices].sort).to eq(vertex_ids.sort)
+			expect(result[:vertices].uniq.sort).to eq(vertex_ids.sort)
 		end
 
 		it "should return a list of edge ids, all of which are included in the edges input" do
@@ -50,8 +55,8 @@ describe AntColonyTsp, type: :feature do
 			end
 		end
 
-		it "there should be num_vertices - 1 edges in the returned edge list" do
-			expect(result[:edges].length).to eq(num_vertices - 1)
+		it "there should be num_vertices edges in the returned edge list" do
+			expect(result[:edges].length).to eq(num_vertices)
 		end
 
 		it "path length should equal the sum of the cost of traversals of the returned edge list" do
@@ -97,10 +102,48 @@ describe AntColonyTsp, type: :feature do
 	end
 
 	describe "checking against exact solutions for small input graphs" do
-		
-	end
+		let(:num_vertices) { 8 }
+		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
+		let(:num_tests) { 20 }
 
-	describe "checking performance against large inputs" do
-		
+		def generate_inputs(num_vertices)
+			TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
+		end
+
+		def find_exact_solution(edge_inputs, vertex_inputs)
+			ExactSolutionFinder.call(vertex_inputs, edge_inputs)
+		end
+
+		def run_ants(edge_inputs, vertex_inputs)
+			AntColonyTsp.execute(edge_inputs: edge_inputs,
+													 vertex_inputs: vertex_inputs,
+													 include_edges_data: include_edges_data,
+													 include_path_length_vs_iteration: include_path_length_vs_iteration)
+		end
+
+		# this test could theoretically fail very rarely
+		it "on average, should be within 10\% of exact solution" do
+			aco_path_lengths = []
+			exact_solutions = []
+
+			for i in 0..num_tests - 1
+				vertex_inputs, edge_inputs = generate_inputs(num_vertices)
+
+				result = run_ants(edge_inputs, vertex_inputs)
+				exact_min_path_length, _ = find_exact_solution(edge_inputs, vertex_inputs)
+				exact_solutions << exact_min_path_length
+				aco_path_lengths << result[:path_length]
+			end
+
+			percent_errors = []
+
+			for i in 0..num_tests - 1
+				percent_errors << find_percent_error(exact_solutions[i], aco_path_lengths[i])
+			end
+
+			avg_percent_error = percent_errors.sum / percent_errors.length.to_f
+
+			expect(avg_percent_error < 10).to be true
+		end
 	end
 end
