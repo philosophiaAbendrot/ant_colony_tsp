@@ -80,11 +80,18 @@ module Ant
 			start_vertex_id = @visited_vertex_ids[0]
 
 			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @@edge_class.find(edge_id) }
-			selected_edge_id = outgoing_edges.select { |edge| edge.end_vertex_id == start_vertex_id }.first.id
+
+			prospective_edges = outgoing_edges.select { |edge| edge.end_vertex_id == start_vertex_id }
+
+			return false if prospective_edges.empty?
+
+			selected_edge_id = prospective_edges.first.id
 
 			@current_vertex_id = start_vertex_id
 			@visited_vertex_ids << start_vertex_id
 			@visited_edge_ids << selected_edge_id
+
+			true
 		end
 
 		def find_path_length

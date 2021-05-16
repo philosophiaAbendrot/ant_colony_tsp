@@ -2,11 +2,14 @@ require "spec_helper"
 
 describe Ant::VertexPreferenceGenerator do
 	include GeneratorHelpers
+	let(:vertex_inputs) { [{ id: 1, x_pos: 5.3, y_pos: 8.9 },
+												 { id: 2, x_pos: -8.4, y_pos: 7.2 },
+												 { id: 3, x_pos: -4, y_pos: -6 },
+												 { id: 4, x_pos: 9.5, y_pos: 5 }] }
+	let(:edge_inputs) { [{ id: 1, cost_of_traversal: 4.6, start_vertex_id: 1, end_vertex_id: 3 },
+											 { id: 2, cost_of_traversal: 9.5, start_vertex_id: 1, end_vertex_id: 4 },
+											 { id: 3, cost_of_traversal: 7.3, start_vertex_id: 1, end_vertex_id: 2 }] } 
 
-	# vertices input format: [id, x_pos, y_pos]
-	let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6], [4, 9.5, 5]] }
-	# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
-	let(:edge_inputs) { [[1, 4.6, 1, 3], [2, 9.5, 1, 4], [3, 7.3, 1, 2]] }
 	let(:default_pheromone_density) { 3 }
 	let(:config) { Config.new }
 

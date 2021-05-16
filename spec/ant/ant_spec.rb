@@ -76,10 +76,10 @@ describe Ant::Ant do
 	end
 
 	describe "move_to_next_city" do
-		# vertices input format: [id, x_pos, y_pos]
-		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6], [4, 9.5, 5]] }
-		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
-		let(:edge_inputs) { [[1, 4.6, 1, 3], [2, 9.5, 1, 4], [3, 7.3, 1, 2]] }
+		let(:vertex_inputs) { [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, {id: 2, x_pos: -8.4, y_pos: 7.2}, {id: 3, x_pos: -4, y_pos: -6}, { id: 4, x_pos: 9.5, y_pos: 5 }] }
+		let(:edge_inputs) { [{ id: 1, cost_of_traversal: 4.6, start_vertex_id: 1, end_vertex_id: 3 },
+												 { id: 2, cost_of_traversal: 9.5, start_vertex_id: 1, end_vertex_id: 4 },
+												 { id: 3, cost_of_traversal: 7.3, start_vertex_id: 1, end_vertex_id: 2 }] }
 
 		let(:mock_rand_gen) { double("rand_gen", rand_float: 0.5) }
 		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
@@ -162,11 +162,59 @@ describe Ant::Ant do
 		end
 	end
 
+	describe "move_to_start" do
+		let(:vertex_inputs) { [{:id=>0, :x_pos=>-18.14, :y_pos=>-19.13}, {:id=>1, :x_pos=>16.25, :y_pos=>-9.67}, {:id=>2, :x_pos=>-3.01, :y_pos=>5.7}, {:id=>3, :x_pos=>-17.55, :y_pos=>-15.14}, {:id=>4, :x_pos=>7.29, :y_pos=>9.51}] }
+		let(:edge_inputs) { [{:id=>0, :start_vertex_id=>0, :end_vertex_id=>1, :cost_of_traversal=>35.66740388646193}, {:id=>1, :start_vertex_id=>0, :end_vertex_id=>2, :cost_of_traversal=>29.076550689516115}, {:id=>2, :start_vertex_id=>0, :end_vertex_id=>3, :cost_of_traversal=>4.033385674591507}, {:id=>3, :start_vertex_id=>0, :end_vertex_id=>4, :cost_of_traversal=>38.30058093554195}, {:id=>4, :start_vertex_id=>1, :end_vertex_id=>0, :cost_of_traversal=>35.66740388646193}, {:id=>5, :start_vertex_id=>1, :end_vertex_id=>2, :cost_of_traversal=>24.641114017024474}, {:id=>6, :start_vertex_id=>1, :end_vertex_id=>3, :cost_of_traversal=>34.23975613230912}, {:id=>7, :start_vertex_id=>1, :end_vertex_id=>4, :cost_of_traversal=>21.169648083990438}, {:id=>8, :start_vertex_id=>2, :end_vertex_id=>0, :cost_of_traversal=>29.076550689516115}, {:id=>9, :start_vertex_id=>2, :end_vertex_id=>1, :cost_of_traversal=>24.641114017024474}, {:id=>10, :start_vertex_id=>2, :end_vertex_id=>3, :cost_of_traversal=>25.410966136689886}, {:id=>11, :start_vertex_id=>2, :end_vertex_id=>4, :cost_of_traversal=>10.982080859290738}, {:id=>12, :start_vertex_id=>3, :end_vertex_id=>0, :cost_of_traversal=>4.033385674591507}, {:id=>13, :start_vertex_id=>3, :end_vertex_id=>1, :cost_of_traversal=>34.23975613230912}, {:id=>14, :start_vertex_id=>3, :end_vertex_id=>2, :cost_of_traversal=>25.410966136689886}, {:id=>15, :start_vertex_id=>3, :end_vertex_id=>4, :cost_of_traversal=>34.99497249606006}, {:id=>16, :start_vertex_id=>4, :end_vertex_id=>0, :cost_of_traversal=>38.30058093554195}, {:id=>17, :start_vertex_id=>4, :end_vertex_id=>1, :cost_of_traversal=>21.169648083990438}, {:id=>18, :start_vertex_id=>4, :end_vertex_id=>2, :cost_of_traversal=>10.982080859290738}, {:id=>19, :start_vertex_id=>4, :end_vertex_id=>3, :cost_of_traversal=>34.99497249606006}] }
+		let(:current_vertex_id) { 4 }
+		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
+		let(:move_ant) { ant.move_to_start }
+
+
+		before(:each) do
+			generate_vertices(vertex_inputs)
+			generate_edges(edge_inputs, config.initial_trail_density)
+			Ant::Ant.new(initialize_params)
+			Graph::Vertex.find(4).outgoing_edge_ids = [16, 17, 18, 19]
+			ant.visited_vertex_ids = [0, 1, 2, 3, 4]
+			ant.visited_edge_ids = [0, 5, 10, 15]
+		end
+
+		it "should move to the correct vertex" do
+			result = move_ant
+			expect(ant.current_vertex).to eq(Graph::Vertex.find(0))
+		end
+
+		it "should return true to indicate that the ant moved successfully" do
+			result = move_ant
+			expect(result).to be true
+		end
+
+		it "should have the first vertex twice in its list of visited vertices" do
+			move_ant
+			expect(ant.visited_vertex_ids[0]).to eq(ant.visited_vertex_ids[-1])
+		end
+
+		it "should have the edge that connects the last vertex to the first vertex in its list of visited edges" do
+			move_ant
+			expect(ant.visited_edge_ids[-1]).to eq(16)
+		end
+
+		context "if there is no connected vertex which has not been visited" do
+			it "ant should not move" do
+
+			end
+
+			it "should return false to indicate that the ant did not move" do
+
+			end
+		end
+	end
+
 	describe "find_path_length" do
-		# vertices input format: [id, x_pos, y_pos]
-		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
-		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
-		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
+		let(:vertex_inputs) { [{ id: 1, x_pos: 5.3, y_pos: 8.9}, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }] }
+		let(:edge_inputs) { [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
+												 { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
+												 { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }] }
 		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
 		before(:each) do
@@ -184,16 +232,16 @@ describe Ant::Ant do
 		end
 
 		it "should return the correct path length" do
-			expected_length = edge_inputs.map { |el| el[1] }.sum
+			expected_length = edge_inputs.map { |el| el[:cost_of_traversal] }.sum
 			expect(ant.find_path_length).to eq(expected_length)
 		end
 	end
 
 	describe "lay_phermones" do
-		# vertices input format: [id, x_pos, y_pos]
-		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
-		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
-		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
+		let(:vertex_inputs) { [{ id: 1, x_pos: 5.3, y_pos: 8.9}, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }] }
+		let(:edge_inputs) { [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
+												 { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
+												 { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }] }
 		let(:mock_edge_class) { double("mock_edge_class", all: [mock_edge_1, mock_edge_2, mock_edge_3]) }
 		let(:mock_edge_1) { double("edge1", cost_of_traversal: 5.3) }
 		let(:mock_edge_2) { double("edge2", cost_of_traversal: 7.0) }
@@ -235,10 +283,10 @@ describe Ant::Ant do
 	end
 
 	describe "reset_to_original_position" do
-		# vertices input format: [id, x_pos, y_pos]
-		let(:vertex_inputs) { [[1, 5.3, 8.9 ], [2, -8.4, 7.2], [3, -4, -6]] }
-		# edges input format: [id, cost_of_traversal, start_vertex_id, end_vertex_id]
-		let(:edge_inputs) { [[1, 5.3, 1, 2], [2, 7.0, 2, 3], [3, 1.1, 3, 1]] }
+		let(:vertex_inputs) { [{ id: 1, x_pos: 5.3, y_pos: 8.9}, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }] }
+		let(:edge_inputs) { [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
+												 { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
+												 { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }] }
 		let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
 		before(:each) do
