@@ -200,12 +200,29 @@ describe Ant::Ant do
 		end
 
 		context "if there is no connected vertex which has not been visited" do
-			it "ant should not move" do
+			let(:edge_inputs) { [{:id=>0, :start_vertex_id=>0, :end_vertex_id=>1, :cost_of_traversal=>35.66740388646193}, {:id=>1, :start_vertex_id=>0, :end_vertex_id=>2, :cost_of_traversal=>29.076550689516115}, {:id=>2, :start_vertex_id=>0, :end_vertex_id=>3, :cost_of_traversal=>4.033385674591507}, {:id=>3, :start_vertex_id=>0, :end_vertex_id=>4, :cost_of_traversal=>38.30058093554195}, {:id=>4, :start_vertex_id=>1, :end_vertex_id=>0, :cost_of_traversal=>35.66740388646193}, {:id=>5, :start_vertex_id=>1, :end_vertex_id=>2, :cost_of_traversal=>24.641114017024474}, {:id=>6, :start_vertex_id=>1, :end_vertex_id=>3, :cost_of_traversal=>34.23975613230912}, {:id=>7, :start_vertex_id=>1, :end_vertex_id=>4, :cost_of_traversal=>21.169648083990438}, {:id=>8, :start_vertex_id=>2, :end_vertex_id=>0, :cost_of_traversal=>29.076550689516115}, {:id=>9, :start_vertex_id=>2, :end_vertex_id=>1, :cost_of_traversal=>24.641114017024474}, {:id=>10, :start_vertex_id=>2, :end_vertex_id=>3, :cost_of_traversal=>25.410966136689886}, {:id=>11, :start_vertex_id=>2, :end_vertex_id=>4, :cost_of_traversal=>10.982080859290738}, {:id=>12, :start_vertex_id=>3, :end_vertex_id=>0, :cost_of_traversal=>4.033385674591507}, {:id=>13, :start_vertex_id=>3, :end_vertex_id=>1, :cost_of_traversal=>34.23975613230912}, {:id=>14, :start_vertex_id=>3, :end_vertex_id=>2, :cost_of_traversal=>25.410966136689886}, {:id=>15, :start_vertex_id=>3, :end_vertex_id=>4, :cost_of_traversal=>34.99497249606006}, {:id=>17, :start_vertex_id=>4, :end_vertex_id=>1, :cost_of_traversal=>21.169648083990438}, {:id=>18, :start_vertex_id=>4, :end_vertex_id=>2, :cost_of_traversal=>10.982080859290738}, {:id=>19, :start_vertex_id=>4, :end_vertex_id=>3, :cost_of_traversal=>34.99497249606006}] }
 
+			before(:each) do
+				Graph::Vertex.find(4).outgoing_edge_ids = [17, 18, 19]
+			end
+
+			it "ant should not move" do
+				move_ant
+				expect(ant.current_vertex_id).to eq(current_vertex_id)
+			end
+
+			it "should not change visited vertex ids" do
+				move_ant
+				expect(ant.visited_vertex_ids).to eq([0, 1, 2, 3, 4])
+			end
+
+			it "should not change visited edge ids" do
+				move_ant
+				expect(ant.visited_edge_ids).to eq([0, 5, 10, 15])
 			end
 
 			it "should return false to indicate that the ant did not move" do
-
+				expect(move_ant).to be false
 			end
 		end
 	end
