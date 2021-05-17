@@ -10,3 +10,6 @@
 
 # ignore installed gem
 /*.gem
+
+# rbenv ruby version
+/.ruby-version
