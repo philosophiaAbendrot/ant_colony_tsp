@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
 	s.authors = ["Tony Ha"]
 	s.files = Dir["{lib}/**/*"]
 
-	s.required_ruby_version = '~> 2.4.0'
+	s.required_ruby_version = '~> 2.4'
 	s.add_dependency("rspec", "~> 3.0.0")
 	s.add_dependency("rspec-core", "~> 3.0.0")
 	s.add_dependency("rspec-expectations", "~> 3.0.0")
