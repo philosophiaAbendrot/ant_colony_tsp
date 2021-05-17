@@ -55,7 +55,6 @@ module Graph
 		def connect_edges_with_vertices
 			@@edge_class.all.each do |edge|
 				edge.start_vertex.outgoing_edge_ids << edge.id
-				edge.end_vertex.incoming_edge_ids << edge.id
 			end
 		end
 	end

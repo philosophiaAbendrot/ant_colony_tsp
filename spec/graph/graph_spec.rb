@@ -8,8 +8,8 @@ describe Graph::Graph do
 		let(:config) { Config.new.process_configs }
 		let(:mock_vertex_class) { class_double("Graph::Vertex") }
 		let(:mock_edge_class) { class_double("Graph::Edge") }
-		let(:mock_vertex_instance_3) { double("vertex_3", outgoing_edge_ids: [], incoming_edge_ids: []) }
-		let(:mock_vertex_instance_4) { double("vertex_4", outgoing_edge_ids: [], incoming_edge_ids: []) }
+		let(:mock_vertex_instance_3) { double("vertex_3", outgoing_edge_ids: []) }
+		let(:mock_vertex_instance_4) { double("vertex_4", outgoing_edge_ids: []) }
 		let(:mock_edge_instance_1) { double("edge_1", id: 1, start_vertex_id: 3, end_vertex_id: 4, start_vertex: mock_vertex_instance_3, end_vertex: mock_vertex_instance_4) }
 		let(:mock_edge_instance_2) { double("edge_2", id: 2, start_vertex_id: 4, end_vertex_id: 3, start_vertex: mock_vertex_instance_4, end_vertex: mock_vertex_instance_3) }
 		let(:initial_trail_density) { 5 }
@@ -101,14 +101,6 @@ describe Graph::Graph do
 
 				expect(vertex_3.outgoing_edge_ids).to eq([1])
 				expect(vertex_4.outgoing_edge_ids).to eq([2])
-			end
-
-			it "incoming edge ids should be populated" do
-				vertex_3 = Graph::Vertex.find(3)
-				vertex_4 = Graph::Vertex.find(4)
-
-				expect(vertex_3.incoming_edge_ids).to eq([2])
-				expect(vertex_4.incoming_edge_ids).to eq([1])
 			end
 		end
 	end	

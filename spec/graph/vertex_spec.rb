@@ -24,9 +24,5 @@ describe Graph::Vertex do
 		it "should initialize outgoing edge ids to an empty array" do
 			expect(vertex.outgoing_edge_ids).to eq([])
 		end
-
-		it "should initialize incoming edge ids to an empty array" do
-			expect(vertex.incoming_edge_ids).to eq([])
-		end
 	end	
 end
