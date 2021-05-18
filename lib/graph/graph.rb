@@ -8,8 +8,6 @@ module Graph
 		end
 
 		def self.set_config(config)
-			@@config = config
-
 			@@vertex_class = config.vertex_class
 			@@edge_class = config.edge_class
 			@@initial_trail_density = config.initial_trail_density
