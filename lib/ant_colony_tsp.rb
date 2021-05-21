@@ -1,13 +1,14 @@
 require 'bundler/setup'
 Bundler.require
 require_relative "modules/databaseable"
+require_relative "modules/rand_gen"
 require_relative "ant/ant"
 require_relative "ant/vertex_preference_generator"
 require_relative "graph/graph"
 require_relative "graph/edge"
 require_relative "graph/vertex"
-require_relative "utils/rand_gen"
 require_relative "config"
+require_relative "errors"
 
 class AntColonyTsp
 	attr_reader :time
@@ -107,6 +108,7 @@ class AntColonyTsp
 			end
 
 			# lay pheromones on the shortest path
+			# ant_with_shortest_path.lay_pheromones if ant_with_shortest_path
 			ant_with_shortest_path.lay_pheromones if ant_with_shortest_path
 
 			# update trail densities
@@ -125,7 +127,10 @@ class AntColonyTsp
 			iteration_path_lengths << shortest_path_length if @include_path_length_vs_iteration
 		end
 
+
 		output = { vertices: global_shortest_path_vertices, edges: global_shortest_path_edges, path_length: global_shortest_path_length }
+
+		raise PathNotFoundError.new("Failed to find a tour. The graph may not have a valid path.") if global_shortest_path_length == Float::INFINITY
 
 		if @include_edges_data
 			edges_data = {}

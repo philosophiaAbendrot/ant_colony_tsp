@@ -15,8 +15,7 @@ class Config
 		@vertex_class = Graph::Vertex
 		@graph_class = Graph::Graph
 		@ant_class = Ant::Ant
-		@rand_gen = Utils::RandGen
-
+		@rand_gen = RandGen
 	end
 
 	def process_configs

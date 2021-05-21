@@ -118,6 +118,7 @@ describe AntColonyTsp, type: :feature do
 	describe "checking against exact solutions for small complete graphs" do
 		let(:num_vertices) { 8 }
 		let(:num_tests) { 20 }
+		let(:include_path_length_vs_iteration) { true }
 
 		# this test could theoretically fail very rarely
 		it "on average, should be within 10\% of exact solution" do
@@ -145,55 +146,55 @@ describe AntColonyTsp, type: :feature do
 		end
 	end
 
-	describe "checking that path lengths found for large complete graphs decay during iteration process" do
-		let(:num_vertices) { 50 }
-		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
-		let(:num_tests) { 10 }
-		let(:include_path_length_vs_iteration) { true }
+	# describe "checking that path lengths found for large complete graphs decay during iteration process" do
+	# 	let(:num_vertices) { 50 }
+	# 	let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
+	# 	let(:num_tests) { 10 }
+	# 	let(:include_path_length_vs_iteration) { true }
 
-		it "path length should decay" do
-			puts "running large scale tests with AntColonyTsp"
-			initial_path_lengths = []
-			path_length_set = []
+	# 	it "path length should decay" do
+	# 		puts "running large scale tests with AntColonyTsp"
+	# 		initial_path_lengths = []
+	# 		path_length_set = []
 
-			for i in 0..num_tests - 1
-				puts "running test #{i}"
-				vertex_inputs, edge_inputs = TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
-				result = run_ants(edge_inputs, vertex_inputs)
-				initial_path_lengths << result[:iteration_path_lengths][0]
-				path_length_set << result[:path_length]
-			end
+	# 		for i in 0..num_tests - 1
+	# 			puts "running test #{i}"
+	# 			vertex_inputs, edge_inputs = TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
+	# 			result = run_ants(edge_inputs, vertex_inputs)
+	# 			initial_path_lengths << result[:iteration_path_lengths][0]
+	# 			path_length_set << result[:path_length]
+	# 		end
 
-			ratio = []
+	# 		ratio = []
 
-			for i in 0..path_length_set.length - 1
-				ratio << initial_path_lengths[i] / path_length_set[i].to_f
-			end
+	# 		for i in 0..path_length_set.length - 1
+	# 			ratio << initial_path_lengths[i] / path_length_set[i].to_f
+	# 		end
 
-			mean_ratio = ratio.sum / ratio.length.to_f
-			expect(mean_ratio).to be > 1.8
-		end
-	end 
+	# 		mean_ratio = ratio.sum / ratio.length.to_f
+	# 		expect(mean_ratio).to be > 1.8
+	# 	end
+	# end 
 
 	describe "testing incomplete graphs" do
 		let(:num_vertices) { 50 }
-		let(:vertices_degree) { 18 }
+		let(:vertices_degree) { 12 }
+		let(:include_path_length_vs_iteration) { true }
 		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: false,
 																																					  num_vertices: num_vertices,
 																																					  write_to_file: false,
 																																					  vertices_degree: vertices_degree) }
-		describe "testing reliability with incomplete graphs" do
-			def multiple_executions_with_incomplete_graphs
-				for i in 0..num_tests - 1
-					vertex_inputs, edge_inputs = generated_inputs
-					result = run_ants(edge_inputs, vertex_inputs)
-				end
-			end
-
+		describe "testing that failures when running incomplete graphs are rare" do
 			let(:num_tests) { 10 }
 
-			it "failures with incomplete graphs should be rare" do
-				expect(multiple_executions_with_incomplete_graphs).to_not raise_error
+			it "should not raise an error with repeated tests" do
+				expect do
+					for i in 0..num_tests - 1
+						puts "Incomplete graph test #{i}"
+						vertex_inputs, edge_inputs = generated_inputs
+						run_ants(edge_inputs, vertex_inputs)
+					end
+				end.to_not raise_error
 			end
 		end
 
@@ -203,7 +204,7 @@ describe AntColonyTsp, type: :feature do
 													 { id: 3, start_vertex_id: 3, end_vertex_id: 4, cost_of_traversal: 4.1 }, { id: 4, start_vertex_id: 4, end_vertex_id: 3, cost_of_traversal: 9.7 }] }
 
 			it "should raise a AntColonyTsp::PathNotFound error" do
-				expect(run_ants(edge_inputs, vertex_inputs)).to raise_error(AntColonyTsp::PathNotFound)
+				expect { run_ants(edge_inputs, vertex_inputs) }.to raise_error(PathNotFoundError)
 			end
 		end
 	end
