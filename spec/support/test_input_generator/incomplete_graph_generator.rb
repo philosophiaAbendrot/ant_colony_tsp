@@ -1,8 +1,10 @@
 module TestInputGenerator
 	class IncompleteGraphGenerator < BaseGraphGenerator
-		def initialize(num_edges:, num_vertices:)
+		def initialize(num_edges:, num_vertices:, constant_difficulty: true, vertices_degree:)
 			@num_edges = num_edges
 			@num_vertices = num_vertices
+			@constant_difficulty = constant_difficulty
+			@vertices_degree = vertices_degree
 		end
 
 		private
@@ -11,66 +13,31 @@ module TestInputGenerator
 			edge_outputs = []
 			vertex_output_ids = vertex_outputs.map { |el| el[:id] }
 
+			# connect each vertex with the top 5 closest vertices
 			edge_id = 0
 
-			# make sure every vertex is connected to at least two other vertices
 			for vertex_output in vertex_outputs
-				loop do
-					vertex_a_id = vertex_output[:id]
+				vertex_id = vertex_output[:id]
+				second_vertex_id = 0
 
-					vertex_b_id, vertex_c_id = vertex_outputs.reject { |vertex_data| vertex_data[:id] == vertex_a_id }.sample(2).map { |el| el[:id] }
-
-					# check if an edge already exists
-					unless duplicate_edge_exists?(vertex_a_id, vertex_b_id)
-						edge_outputs << { id: edge_id, start_vertex_id: vertex_a_id, end_vertex_id: vertex_b_id }
-						edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b_id, end_vertex_id: vertex_a_id }
-
-						edge_outputs << { id: edge_id + 2, start_vertex_id: vertex_a_id, end_vertex_id: vertex_c_id }
-						edge_outputs << { id: edge_id + 3, start_vertex_id: vertex_c_id, end_vertex_id: vertex_a_id }
-
-						# update adj matrix with a placeholder value
-						@adj_mat[vertex_a_id][vertex_b_id] = 0
-						@adj_mat[vertex_b_id][vertex_a_id] = 0
-						@adj_mat[vertex_a_id][vertex_c_id] = 0
-						@adj_mat[vertex_c_id][vertex_a_id] = 0
-						edge_id += 4
-						break
-					end
+				vertex_distances = @adj_mat[vertex_id].map do |dist|
+					result = [second_vertex_id, dist]
+					second_vertex_id += 1
+					result
 				end
-			end
 
+				vertex_distances.delete_at(vertex_id)
 
-			for i in 0..((@num_edges - edge_outputs.length) / 2) - 1
-				# make additional edges between random vertices
+				closest_vertices = vertex_distances.sort_by { |el| el[1] }[0..@vertices_degree - 1]
 
-				loop do
-					vertex_a, vertex_b = vertex_outputs.sample(2)
+				for second_vertex_id, dist in closest_vertices
+					difficulty_1 = @constant_difficulty ? 1 : Math.exp(rand - 0.5)
+					difficulty_2 = @constant_difficulty ? 1 : Math.exp(rand - 0.5)
 
-					unless duplicate_edge_exists?(vertex_a[:id], vertex_b[:id])
-						edge_outputs << { id: edge_id, start_vertex_id: vertex_a[:id], end_vertex_id: vertex_b[:id] }
-						edge_outputs << { id: edge_id + 1, start_vertex_id: vertex_b[:id], end_vertex_id: vertex_a[:id] }
-						# update adj matrix with a placeholder value
-						@adj_mat[vertex_a[:id]][vertex_b[:id]] = 0
-						@adj_mat[vertex_b[:id]][vertex_a[:id]] = 0
-						edge_id += 2
-						break
-					end
+					edge_outputs << { id: edge_id, start_vertex_id: vertex_id, end_vertex_id: second_vertex_id, cost_of_traversal: dist * difficulty_1 }
+					edge_outputs << { id: edge_id + 1, start_vertex_id: second_vertex_id, end_vertex_id: vertex_id, cost_of_traversal: dist * difficulty_2 }
+					edge_id += 2
 				end
-			end
-
-			# once all edges are generated, calculate the cost of traversal by multiplying distance between
-			# start and end vertex and a random "difficulty" factor
-			for i in 0..edge_outputs.length - 1
-				edge_output = edge_outputs[i]
-				difficulty = Math.exp(rand - 0.5)
-
-				start_vertex_data = vertex_outputs[edge_output[:start_vertex_id]]
-				end_vertex_data = vertex_outputs[edge_output[:end_vertex_id]]
-
-				distance = Math.sqrt((end_vertex_data[:x_pos] - start_vertex_data[:x_pos])**2 + (end_vertex_data[:y_pos] - start_vertex_data[:y_pos])**2)
-				edge_output[:cost_of_traversal] = (distance * difficulty).round(2)
-				# update adj matrix with cost of traversal
-				@adj_mat[start_vertex_data[:id]][end_vertex_data[:id]] = edge_output[:cost_of_traversal]
 			end
 
 			edge_outputs
