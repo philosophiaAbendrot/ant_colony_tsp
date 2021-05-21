@@ -107,7 +107,7 @@ class AntColonyTsp
 			end
 
 			# lay pheromones on the shortest path
-			ant_with_shortest_path.lay_pheromones
+			ant_with_shortest_path.lay_pheromones if ant_with_shortest_path
 
 			# update trail densities
 			@edge_class.update_trail_densities
