@@ -146,35 +146,35 @@ describe AntColonyTsp, type: :feature do
 		end
 	end
 
-	# describe "checking that path lengths found for large complete graphs decay during iteration process" do
-	# 	let(:num_vertices) { 50 }
-	# 	let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
-	# 	let(:num_tests) { 10 }
-	# 	let(:include_path_length_vs_iteration) { true }
+	describe "checking that path lengths found for large complete graphs decay during iteration process" do
+		let(:num_vertices) { 50 }
+		let(:generated_inputs) { TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false) }
+		let(:num_tests) { 10 }
+		let(:include_path_length_vs_iteration) { true }
 
-	# 	it "path length should decay" do
-	# 		puts "running large scale tests with AntColonyTsp"
-	# 		initial_path_lengths = []
-	# 		path_length_set = []
+		it "path length should decay" do
+			puts "running large scale tests with AntColonyTsp"
+			initial_path_lengths = []
+			path_length_set = []
 
-	# 		for i in 0..num_tests - 1
-	# 			puts "running test #{i}"
-	# 			vertex_inputs, edge_inputs = TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
-	# 			result = run_ants(edge_inputs, vertex_inputs)
-	# 			initial_path_lengths << result[:iteration_path_lengths][0]
-	# 			path_length_set << result[:path_length]
-	# 		end
+			for i in 0..num_tests - 1
+				puts "running test #{i}"
+				vertex_inputs, edge_inputs = TestInputGenerator::TestInputGenerator.execute(complete_graph: true, num_vertices: num_vertices, write_to_file: false)
+				result = run_ants(edge_inputs, vertex_inputs)
+				initial_path_lengths << result[:iteration_path_lengths][0]
+				path_length_set << result[:path_length]
+			end
 
-	# 		ratio = []
+			ratio = []
 
-	# 		for i in 0..path_length_set.length - 1
-	# 			ratio << initial_path_lengths[i] / path_length_set[i].to_f
-	# 		end
+			for i in 0..path_length_set.length - 1
+				ratio << initial_path_lengths[i] / path_length_set[i].to_f
+			end
 
-	# 		mean_ratio = ratio.sum / ratio.length.to_f
-	# 		expect(mean_ratio).to be > 1.8
-	# 	end
-	# end 
+			mean_ratio = ratio.sum / ratio.length.to_f
+			expect(mean_ratio).to be > 1.8
+		end
+	end
 
 	describe "testing incomplete graphs" do
 		let(:num_vertices) { 50 }
