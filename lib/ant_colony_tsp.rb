@@ -144,6 +144,12 @@ class AntColonyTsp
 		end
 
 		output.merge!(iteration_path_lengths: iteration_path_lengths) if @include_path_length_vs_iteration
+
+		# clear all database records to prevent application from getting slower with each call
+		@ant_class.destroy_all
+		@edge_class.destroy_all
+		@vertex_class.destroy_all
+
 		output
 	end
 
