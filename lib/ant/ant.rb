@@ -44,13 +44,27 @@ module Ant
 		#
 		# config - Object used to configure various classes.
 		def self.set_config(config)
+			# The vertex class.
 			@@vertex_class = config.vertex_class
+			
+			# The edge class.
 			@@edge_class = config.edge_class
+			
+			# Class used to generate random numbers.
 			@@rand_gen = config.rand_gen
+			
+			# The amount of pheromone which is deposited by the ant which
+			#   finds the shortest trail. This amount of pheromone is divided
+			#   evenly among all the edges of the trail.
 			@@q = config.q
-			@@alpha = config.alpha
-			@@beta = config.beta
 
+			# alpha - coefficient controlling the importance of pheromone strength in
+			#   influencing choice of next vertex.
+			@@alpha = config.alpha
+			# beta - coefficient controlling the importance of proximity in
+			#   influencing choice of next vertex.
+			@@beta = config.beta
+			
 			nil
 		end
 
