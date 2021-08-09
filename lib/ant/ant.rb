@@ -1,16 +1,20 @@
-# Internal: Module which contains the Ant class for traversing the graph and its supporting logic.
+# Internal: Module which contains the Ant class for traversing the graph and
+#   its supporting logic.
 module Ant
-	# Internal: Class used for traversing graph and marking it with pheromones.
+	# Internal: Class used for traversing graph and marking it with
+	#   pheromones.
 	class Ant
 		extend Databaseable
 
 		# Internal: Gets/sets the id of the vertex the ant is currently on.
 		attr_accessor :current_vertex_id
 		#
-		# Internal: Gets/sets the list of ids of the vertices that the ant has visited. 
+		# Internal: Gets/sets the list of ids of the vertices that the ant has
+		#   visited. 
 		attr_accessor :visited_vertex_ids
 		#
-		# Internal: Gets/sets the list of ids of the edges that the ant has visited.
+		# Internal: Gets/sets the list of ids of the edges that the ant has
+		#   visited.
 		attr_accessor :visited_edge_ids
 
 		# Internal: Initialize ant
@@ -57,15 +61,16 @@ module Ant
 			@@vertex_class.find(@current_vertex_id)
 		end
 
-		# Internal: Returns the x_pos of the vertex that the ant is currently on.
+		# Internal: Returns the x_pos of the vertex that the ant is currently
+		#   on.
 		#
 		# Returns the x_pos of the vertex that the ant is currently on.
 		def x_pos
 			current_vertex.x_pos
 		end
 
-		# Internal: Returns the y_pos of the vertex that the ant is currently on.
-		#
+		# Internal: Returns the y_pos of the vertex that the ant is currently
+		#   on.
 		# Returns the x_pos of the vertex that the ant is currently on.
 		def y_pos
 			current_vertex.y_pos
@@ -73,15 +78,18 @@ module Ant
 
 		# Internal: Makes the ant select a vertex to move to and move to it.
 		#
-		# Returns true if the ant successfully moved to the next vertex. Returns false if the ant has reached
-		# 	a dead end and cannot move. This can occur if there are no outgoing edges to vertices that haven't
-		#   been visited, or if all vertices have been visited.
+		# Returns true if the ant successfully moved to the next vertex.
+		#   Returns false if the ant has reached a dead end and cannot
+		#   move. This can occur if there are no outgoing edges to vertice
+		#   that haven't been visited, or if all vertices have been visited.
 		def move_to_next_vertex
 			# Evaluate preferences.
 			outgoing_edges = current_vertex.outgoing_edge_ids.map { |edge_id| @@edge_class.find(edge_id) }
 
 			# Generate a representation of the ant's preferences for each connected vertex.
-			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges, visited_vertex_ids: @visited_vertex_ids.dup, alpha: @@alpha, beta: @@beta)
+			cumulative_preferences = VertexPreferenceGenerator.execute(outgoing_edges: outgoing_edges,
+																	   visited_vertex_ids: @visited_vertex_ids.dup,
+																	   alpha: @@alpha, beta: @@beta)
 
 			# If there is no option to move to a vertex, terminate early and return false to indicate that no movement occurred.
 			return false if cumulative_preferences.empty?
