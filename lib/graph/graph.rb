@@ -5,7 +5,7 @@ module Graph
 	class Graph
 		# Internal: Initialize a graph.
 		#
-		# edge_inputs - An array of hashes which represents edges.
+		# edge_inputs - An array of Hash objects which represents edges.ha
 		#   The hashes hold values for the following keys:
 		#     id - the Integer id of the edge.
 		#     start_vertex_id - the Integer id of the vertex the edge starts on.
@@ -67,11 +67,7 @@ module Graph
 		# Returns nothing.
 		# Raises ArgumentError if 'edge_inputs' field is not an array.
 		def initialize_edges(edge_inputs)
-			# edge input format
-			# [id: integer, start_vertex_id: integer, end_vertex_id: integer, cost_of_traversal: double]
-
 			raise ArgumentError.new("Edges input is not an array") unless edge_inputs.is_a?(Array)
-
 
 			edge_inputs.each do |edge_input|
 				if edge_input.is_a?(Hash)

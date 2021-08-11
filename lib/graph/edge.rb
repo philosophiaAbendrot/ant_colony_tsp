@@ -3,6 +3,7 @@
 module Graph
 	# Internal: Class which represents an edge.
 	class Edge
+		# Logic which stores instances and allow them to be searched.
 		extend Databaseable
 
 		# Internal: Gets/sets the density of the pheromones on the edge.

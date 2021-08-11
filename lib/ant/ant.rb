@@ -4,6 +4,7 @@ module Ant
 	# Internal: Class used for traversing graph and marking it with
 	#   pheromones.
 	class Ant
+		# Logic which stores instances and allow them to be searched.
 		extend Databaseable
 
 		# Internal: Gets/sets the id of the vertex the ant is currently on.
@@ -19,16 +20,23 @@ module Ant
 
 		# Internal: Initialize ant
 		#
-		# current_vertex_id: the id of the vertex that the ant starts on.
-		# id: the id of the ant.
+		# current_vertex_id: The Integer id of the vertex that the ant starts
+		#   on.
+		# id - The Integer id of the ant.
+		#
+		# Returns nothing.
 		def initialize(current_vertex_id:, id:)
 			@id = id
 			@current_vertex_id = current_vertex_id
 			@visited_edge_ids = []
 			@visited_vertex_ids = [current_vertex_id]
+
+			nil
 		end
 
 		# Internal: Returns all ants to their original vertices.
+		#
+		# Returns nothing.
 		def self.reset_to_original_position
 			all.each do |ant|
 				first_vertex_id = ant.visited_vertex_ids[0]
@@ -43,6 +51,8 @@ module Ant
 		# Internal: Sets values of configurable class variables.
 		#
 		# config - Object used to configure various classes.
+		#
+		# Returns nothing.
 		def self.set_config(config)
 			# The vertex class.
 			@@vertex_class = config.vertex_class
@@ -85,6 +95,7 @@ module Ant
 
 		# Internal: Returns the y_pos of the vertex that the ant is currently
 		#   on.
+		#
 		# Returns the x_pos of the vertex that the ant is currently on.
 		def y_pos
 			current_vertex.y_pos
@@ -105,10 +116,12 @@ module Ant
 																	   visited_vertex_ids: @visited_vertex_ids.dup,
 																	   alpha: @@alpha, beta: @@beta)
 
-			# If there is no option to move to a vertex, terminate early and return false to indicate that no movement occurred.
+			# If there is no option to move to a vertex, terminate early and
+			#   return false to indicate that no movement occurred.
 			return false if cumulative_preferences.empty?
 
-			# Use a random number to randomly select a vertex to move to based on the generated preferences.
+			# Use a random number to randomly select a vertex to move to based
+			#   on the generated preferences.
 			rand_num = @@rand_gen.rand_float
 
 			selected_vertex_id = nil
@@ -122,7 +135,8 @@ module Ant
 				end
 			end
 
-			# Find the edge that the ant must travel through to travel to the new vertex.
+			# Find the edge that the ant must travel through to travel to the
+			#   new vertex.
 			selected_edge_id = outgoing_edges.select { |edge| edge.end_vertex_id == selected_vertex_id }.first.id
 
 			# Move to new vertex.
