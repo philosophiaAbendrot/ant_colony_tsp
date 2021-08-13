@@ -10,7 +10,7 @@ require_relative "graph/vertex"
 require_relative "config"
 require_relative "errors"
 
-# External: Main exectuable class for running this project.
+# Public: Main exectuable class for running this project.
 #   Accepts edges, vertices, and other parameters.
 #   Initializes and configures objects based on inputs.
 #   Runs ant colony optimization logic.
@@ -76,7 +76,7 @@ class AntColonyTsp
 		@@config
 	end
 
-	# External: Exposes Config object, allowing user to configure it using a
+	# Public: Exposes Config object, allowing user to configure it using a
 	#   block.
 	#
 	# &block - A block used to update the Config object.
@@ -94,7 +94,7 @@ class AntColonyTsp
 		self.config.process_configs
 	end
 
-	# External: Main entry method for this project. Takes in inputs for
+	# Public: Main entry method for this project. Takes in inputs for
 	#   vertices, edges, and other options for output. Runs the ant colony
 	#   optimization algorithm and returns the shortest path.
 	#

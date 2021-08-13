@@ -23,15 +23,11 @@ module Ant
 		# current_vertex_id: The Integer id of the vertex that the ant starts
 		#   on.
 		# id - The Integer id of the ant.
-		#
-		# Returns nothing.
 		def initialize(current_vertex_id:, id:)
 			@id = id
 			@current_vertex_id = current_vertex_id
 			@visited_edge_ids = []
 			@visited_vertex_ids = [current_vertex_id]
-
-			nil
 		end
 
 		# Internal: Returns all ants to their original vertices.
