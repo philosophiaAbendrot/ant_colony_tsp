@@ -43,7 +43,7 @@ module Ant
         ant.current_vertex_id = first_vertex_id
       end
 
-      nil
+      return
     end
 
     # Internal: Sets values of configurable class variables.
@@ -73,7 +73,7 @@ module Ant
       #   influencing choice of next vertex.
       @@beta = config.beta
 
-      nil
+      return
     end
 
     # Internal: Return the vertex that the ant object is currently on.
@@ -188,7 +188,7 @@ module Ant
         edge.add_pheromones(trail_density)
       end
 
-      nil
+      return
     end
   end
 end

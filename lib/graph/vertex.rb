@@ -33,8 +33,6 @@ module Graph
       @x_pos = x_pos.to_f
       @y_pos = y_pos.to_f
       @outgoing_edge_ids = []
-
-      nil
     end
   end
 end

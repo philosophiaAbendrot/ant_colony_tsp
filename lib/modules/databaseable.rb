@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Internal: Module which allows the class that it is extended into to have all
 #   its instances to be stored in a class instance field and have them
 #   accessible by their id.
@@ -68,6 +70,6 @@ module Databaseable
   def destroy_all
     @instances = {}
 
-    nil
+    return
   end
 end

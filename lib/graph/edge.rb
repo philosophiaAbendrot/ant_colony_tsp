@@ -107,7 +107,7 @@ module Graph
     def add_pheromones(delta)
       @delta_trail_density = delta
 
-      nil
+      return
     end
   end
 end

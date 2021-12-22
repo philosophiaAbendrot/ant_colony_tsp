@@ -65,8 +65,6 @@ class AntColonyTsp
     @edge_class.set_config(config)
     @graph_class.set_config(config)
     @ant_class.set_config(config)
-
-    nil
   end
 
   # Internal: Gets Config object associated with class.
@@ -276,6 +274,6 @@ class AntColonyTsp
       ant_id += 1
     end
 
-    nil
+    return
   end
 end

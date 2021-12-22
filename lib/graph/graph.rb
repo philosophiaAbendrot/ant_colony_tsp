@@ -34,8 +34,6 @@ module Graph
       initialize_edges(edge_inputs)
       initialize_vertices(vertex_inputs)
       connect_edges_with_vertices
-
-      nil
     end
 
     # Internal: Sets values of configurable class variables.
@@ -50,7 +48,7 @@ module Graph
       @@initial_trail_density = config.initial_trail_density
       @@rho = config.rho
 
-      nil
+      return
     end
 
     private
@@ -82,7 +80,7 @@ module Graph
       # set initial trail densities
       @@edge_class.initialize_trail_densities
 
-      nil
+      return
     end
 
     # Internal: Initializes vertices using an input object which is a
@@ -109,7 +107,7 @@ module Graph
         end
       end
 
-      nil
+      return
     end
 
     # Internal: Connects vertex and edge objects together based on the
@@ -121,7 +119,7 @@ module Graph
         edge.start_vertex.outgoing_edge_ids << edge.id
       end
 
-      nil
+      return
     end
   end
 end
