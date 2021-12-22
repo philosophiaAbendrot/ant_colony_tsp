@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Internal: Class used for configuring parameters for various classes.
 class Config
   # Internal: Gets/sets the Integer number of ants used for ACO algorithm.

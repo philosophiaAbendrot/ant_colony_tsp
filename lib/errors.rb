@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Public: General error class.
 class Error < StandardError
 end

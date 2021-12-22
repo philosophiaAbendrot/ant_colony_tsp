@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require_relative '../support/test_input_generator/base_graph_generator'
 require_relative '../support/test_input_generator/complete_graph_generator'

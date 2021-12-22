@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExactSolutionFinder
   def initialize(edge_input, vertex_input)
     @vertex_input = vertex_input

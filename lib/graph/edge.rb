@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Internal: Module which contains models relating to the graph which is the
 #   composition of the edges and the vertices which are supplied as an input.
 module Graph

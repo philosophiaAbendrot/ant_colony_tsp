@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Internal: Module which contains Ant class for traversing graph and its
 #   supporting logic.
 module Ant

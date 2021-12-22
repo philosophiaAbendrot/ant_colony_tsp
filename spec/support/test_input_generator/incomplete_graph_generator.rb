@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TestInputGenerator
   class IncompleteGraphGenerator < BaseGraphGenerator
     def initialize(num_edges:, num_vertices:, vertices_degree:, constant_difficulty: true)
