@@ -6,7 +6,6 @@ require_relative '../support/test_input_generator/test_input_generator'
 require_relative '../support/exact_solution_finder'
 
 describe AntColonyTsp, type: :feature do
-  let(:include_edges_data) { false }
   let(:include_path_length_vs_iteration) { false }
 
   def read_inputs_from_file
@@ -34,7 +33,6 @@ describe AntColonyTsp, type: :feature do
   def run_ants(edge_inputs, vertex_inputs)
     AntColonyTsp.execute(edge_inputs: edge_inputs,
                          vertex_inputs: vertex_inputs,
-                         include_edges_data: include_edges_data,
                          include_path_length_vs_iteration: include_path_length_vs_iteration)
   end
 
@@ -55,7 +53,6 @@ describe AntColonyTsp, type: :feature do
     let(:result) do
       AntColonyTsp.execute(edge_inputs: edge_inputs,
                            vertex_inputs: vertex_inputs,
-                           include_edges_data: include_edges_data,
                            include_path_length_vs_iteration: include_path_length_vs_iteration)
     end
 
@@ -91,23 +88,6 @@ describe AntColonyTsp, type: :feature do
       diff = (expected_path_length - result[:path_length]).abs
       percent_diff = diff / ((expected_path_length + result[:path_length]) / 2.0) * 100
       expect(percent_diff).to be < 0.1
-    end
-
-    context "when 'include_edges_data' is set to true" do
-      let(:include_edges_data) { true }
-
-      it 'edges_data should have same length as input edges' do
-        expect(result[:edges_data].length).to eq(edge_inputs.length)
-      end
-
-      it 'edges data should be equivalent to input edges' do
-        edge_data = result[:edges_data]
-
-        edge_inputs.each do |input_edge|
-          edge_data_pair = edge_data[input_edge[:id]]
-          expect(edge_data_pair[:start_vertex_id]).to eq(input_edge[:start_vertex_id])
-        end
-      end
     end
 
     context 'when include_path_length_vs_iteration is set to true' do
