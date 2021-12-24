@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe Ant::VertexPreferenceGenerator do
+describe Ant::VertexPreferences do
   include GeneratorHelpers
   let(:vertex_inputs) do
     [{ id: 1, x_pos: 5.3, y_pos: 8.9 },
@@ -18,6 +18,7 @@ describe Ant::VertexPreferenceGenerator do
 
   let(:default_pheromone_density) { 3 }
   let(:config) { Config.new }
+  let(:rand_gen) { double('rand_gen', rand_float: 0.712) }
 
   before(:each) do
     generate_vertices(vertex_inputs)
@@ -60,9 +61,20 @@ describe Ant::VertexPreferenceGenerator do
       cumulative_prob += hashed_result[edge_3.end_vertex_id]
       cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
-      result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids,
-                                                      outgoing_edges: Graph::Edge.all, alpha: config.alpha, beta: config.beta)
-      expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
+      preferences = Ant::VertexPreferences.new(
+        visited_vertex_ids: visited_vertex_ids,
+        outgoing_edges:     Graph::Edge.all,
+        alpha:              config.alpha,
+        beta:               config.beta,
+        rand_gen:           rand_gen
+      )
+
+      expect(
+        compare_array_of_floats(
+          preferences.preference_mapping,
+          cumulative_probability_mapping
+        )
+      ).to be true
     end
   end
 
@@ -93,9 +105,15 @@ describe Ant::VertexPreferenceGenerator do
       cumulative_prob += hashed_result[edge_3.end_vertex_id]
       cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
-      result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids,
-                                                      outgoing_edges: Graph::Edge.all, alpha: config.alpha, beta: config.beta)
-      expect(compare_array_of_floats(result, cumulative_probability_mapping)).to be true
+      preferences = Ant::VertexPreferences.new(
+        visited_vertex_ids: visited_vertex_ids,
+        outgoing_edges:     Graph::Edge.all,
+        alpha:              config.alpha,
+        beta:               config.beta,
+        rand_gen:           rand_gen)
+
+      expect(compare_array_of_floats(preferences.preference_mapping,
+                                     cumulative_probability_mapping)).to be true
     end
   end
 
@@ -103,9 +121,15 @@ describe Ant::VertexPreferenceGenerator do
     let(:visited_vertex_ids) { [1, 2, 3, 4] }
 
     it 'should return an empty array' do
-      result = Ant::VertexPreferenceGenerator.execute(visited_vertex_ids: visited_vertex_ids,
-                                                      outgoing_edges: Graph::Edge.all, alpha: config.alpha, beta: config.beta)
-      expect(result).to eq([])
+      preferences = Ant::VertexPreferences.new(
+        visited_vertex_ids: visited_vertex_ids,
+        outgoing_edges:     Graph::Edge.all,
+        alpha:              config.alpha,
+        beta:               config.beta,
+        rand_gen:           rand_gen
+      )
+
+      expect(preferences.preference_mapping).to eq([])
     end
   end
 

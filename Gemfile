@@ -13,4 +13,5 @@ end
 group :development do
   gem 'rubocop'
   gem 'pry'
+  gem 'pry-byebug'
 end

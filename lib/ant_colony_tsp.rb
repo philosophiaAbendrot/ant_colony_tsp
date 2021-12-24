@@ -5,7 +5,7 @@ Bundler.require
 require_relative 'modules/databaseable'
 require_relative 'modules/rand_gen'
 require_relative 'ant/ant'
-require_relative 'ant/vertex_preference_generator'
+require_relative 'ant/vertex_preferences'
 require_relative 'graph/graph'
 require_relative 'graph/edge'
 require_relative 'graph/vertex'

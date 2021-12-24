@@ -156,27 +156,13 @@ module Ant
     private
 
     def evaluate_preferences
-      VertexPreferenceGenerator
-        .execute(outgoing_edges: outgoing_edges,
-                 visited_vertex_ids: @visited_vertex_ids.dup,
-                 alpha: self.class.alpha,
-                 beta: self.class.beta)
-    end
-
-    def select_rand_vertex(cumulative_preferences)
-      rand_num = self.class.rand_gen.rand_float
-      selected_vertex_id = nil
-
-      (0..cumulative_preferences.length - 1).each do |i|
-        vertex_id, cumulative_probability = cumulative_preferences[i]
-
-        if cumulative_probability >= rand_num
-          selected_vertex_id = vertex_id
-          break
-        end
-      end
-
-      selected_vertex_id
+      VertexPreferences.new(
+        outgoing_edges: outgoing_edges,
+        visited_vertex_ids: @visited_vertex_ids.dup,
+        alpha: self.class.alpha,
+        beta: self.class.beta,
+        rand_gen: self.class.rand_gen
+      )
     end
 
     def find_connecting_edge(selected_vertex_id)
@@ -188,8 +174,7 @@ module Ant
     def find_next_edge_and_vertex
       cumulative_preferences = evaluate_preferences
       return [nil, nil] if cumulative_preferences.empty?
-
-      selected_vertex_id = select_rand_vertex(cumulative_preferences)
+      selected_vertex_id = cumulative_preferences.select_rand_vertex
       selected_edge_id = find_connecting_edge(selected_vertex_id)
       [selected_vertex_id, selected_edge_id]
     end
