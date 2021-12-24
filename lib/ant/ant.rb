@@ -174,6 +174,7 @@ module Ant
     def find_next_edge_and_vertex
       cumulative_preferences = evaluate_preferences
       return [nil, nil] if cumulative_preferences.empty?
+
       selected_vertex_id = cumulative_preferences.select_rand_vertex
       selected_edge_id = find_connecting_edge(selected_vertex_id)
       [selected_vertex_id, selected_edge_id]
