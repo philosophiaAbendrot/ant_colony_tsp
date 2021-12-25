@@ -17,7 +17,7 @@ require_relative 'errors'
 #   Initializes and configures objects based on inputs.
 #   Runs ant colony optimization logic.
 #   Exports data.
-class AntColonyTsp
+class PathFinder
   # Internal: Initializes AntColonyTsp class.
   #
   # edge_inputs - An Array of Hash objects containing information on the
@@ -51,7 +51,7 @@ class AntColonyTsp
     @vertex_inputs = vertex_inputs
     @include_path_length_vs_iteration = include_path_length_vs_iteration
 
-    config = AntColonyTsp.config
+    config = self.class.config
 
     @num_ants = config.num_ants
     @ant_class = config.ant_class

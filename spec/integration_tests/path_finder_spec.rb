@@ -7,7 +7,7 @@ require_relative '../support/test_input_generator/incomplete_graph_generator'
 require_relative '../support/test_input_generator/test_input_generator'
 require_relative '../support/exact_solution_finder'
 
-describe AntColonyTsp, type: :feature do
+describe PathFinder, type: :feature do
   let(:include_path_length_vs_iteration) { false }
 
   def read_inputs_from_file
@@ -33,7 +33,7 @@ describe AntColonyTsp, type: :feature do
   end
 
   def run_ants(edge_inputs, vertex_inputs)
-    AntColonyTsp.execute(edge_inputs: edge_inputs,
+    PathFinder.execute(edge_inputs: edge_inputs,
                          vertex_inputs: vertex_inputs,
                          include_path_length_vs_iteration: include_path_length_vs_iteration)
   end
@@ -53,7 +53,7 @@ describe AntColonyTsp, type: :feature do
     let(:edge_inputs) { generated_inputs[1] }
     let(:vertex_inputs) { generated_inputs[0] }
     let(:result) do
-      AntColonyTsp.execute(edge_inputs: edge_inputs,
+      PathFinder.execute(edge_inputs: edge_inputs,
                            vertex_inputs: vertex_inputs,
                            include_path_length_vs_iteration: include_path_length_vs_iteration)
     end
@@ -96,7 +96,7 @@ describe AntColonyTsp, type: :feature do
       let(:include_path_length_vs_iteration) { true }
 
       it "path length output should have same length as 'num_iterations' config variable" do
-        expect(result[:iteration_path_lengths].length).to eq(AntColonyTsp.config.num_iterations)
+        expect(result[:iteration_path_lengths].length).to eq(PathFinder.config.num_iterations)
       end
     end
   end
@@ -143,7 +143,7 @@ describe AntColonyTsp, type: :feature do
     let(:include_path_length_vs_iteration) { true }
 
     it 'path length should decay' do
-      puts 'running large scale tests with AntColonyTsp'
+      puts 'running large scale tests with PathFinder'
       initial_path_lengths = []
       path_length_set = []
 
