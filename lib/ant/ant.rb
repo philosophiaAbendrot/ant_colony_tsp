@@ -25,7 +25,7 @@ module Ant
     # current_vertex_id: The Integer id of the vertex that the ant starts
     #   on.
     # id - The Integer id of the ant.
-    def initialize(current_vertex_id:, id:)
+    def initialize(id:, current_vertex_id: nil)
       @id = id
       @current_vertex_id = current_vertex_id
       @visited_edge_ids = []

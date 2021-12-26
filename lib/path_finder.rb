@@ -9,6 +9,7 @@ require_relative 'ant/vertex_preferences'
 require_relative 'graph/graph'
 require_relative 'graph/edge'
 require_relative 'graph/vertex'
+require_relative 'services/ant_initializer_service'
 require_relative 'config'
 require_relative 'errors'
 
