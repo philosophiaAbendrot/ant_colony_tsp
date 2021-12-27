@@ -40,12 +40,11 @@ RSpec.describe AntInitializerService do
 
     describe 'places ants' do
       it 'places ants in random locations' do
-        allow(ant_class).to receive(:new).and_return(
-          ant_instance
-        )
-        expect(ant_instance).to receive(:current_vertex_id=)
-          .with(vertices[rand_gen_result].id)
-          .and_return(nil)
+        random_current_vertex_id = vertices[rand_gen_result].id
+
+        allow(ant_class).to receive(:new) do |args|
+          expect(args[:current_vertex_id]).to eq random_current_vertex_id
+        end.and_return(ant_instance)
 
         result
       end

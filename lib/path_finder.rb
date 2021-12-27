@@ -160,13 +160,12 @@ class PathFinder
     initialize_graph
     # Initialize ants and place them on random vertices.
     initialize_ants
-    iteration_count = 0
     global_shortest_path_vertices = nil
     global_shortest_path_edges = nil
     global_shortest_path_length = Float::INFINITY
     iteration_path_lengths = []
 
-    (0..@num_iterations - 1).each do |_iteration_count|
+    @num_iterations.times do
       @ant_class.all.each do |ant|
         # Make every ant execute one tour.
         completed = true
@@ -192,7 +191,8 @@ class PathFinder
 
       @ant_class.all.each do |ant|
         # If ant path is shorter than the currently shortest path and ant completed a full tour.
-        unless (path_length = ant.find_path_length) < shortest_path_length && (ant.visited_edge_ids.length == @num_vertices)
+        unless (path_length = ant.find_path_length) < shortest_path_length &&
+               (ant.visited_edge_ids.length == @num_vertices)
           next
         end
 
@@ -203,7 +203,7 @@ class PathFinder
       end
 
       # Lay pheromones on the shortest path.
-      ant_with_shortest_path.lay_pheromones if ant_with_shortest_path
+      ant_with_shortest_path&.lay_pheromones
 
       # Update trail densities.
       @edge_class.update_trail_densities
@@ -268,13 +268,13 @@ class PathFinder
   #
   # Returns nothing.
   def initialize_ants
-    ant_id = 1
-    @num_ants.times do
-      rand_num = @rand_gen.rand_int(@vertex_class.all.length)
-      @ant_class.new(current_vertex_id: @vertex_class.all[rand_num].id, id: ant_id)
-      ant_id += 1
-    end
+    AntInitializerService.new(
+      ant_class: @ant_class,
+      vertices: @vertex_class.all,
+      num_ants: @num_ants,
+      rand_gen: @rand_gen
+    ).execute
 
-    return
+    nil
   end
 end

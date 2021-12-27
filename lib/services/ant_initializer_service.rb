@@ -9,20 +9,20 @@ class AntInitializerService
   end
 
   def execute
-    ants = instantiate_ants
-    ants.each { |ant| place_ant(ant) }
+    instantiate_ants
     true
   end
 
   private
 
-  def place_ant(ant)
-    ant.current_vertex_id = @vertices[@rand_gen.rand_int(@vertices.length)].id
+  def start_vertex_id
+    rand_num = @rand_gen.rand_int(@vertices.length)
+    @vertices[rand_num].id
   end
 
   def instantiate_ants
     (1..@num_ants).map do |id|
-      @ant_class.new(id: id)
+      @ant_class.new(id: id, current_vertex_id: start_vertex_id)
     end
   end
 end
