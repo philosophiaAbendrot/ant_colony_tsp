@@ -160,82 +160,15 @@ class PathFinder
     initialize_graph
     # Initialize ants and place them on random vertices.
     initialize_ants
-    global_shortest_path_vertices = nil
-    global_shortest_path_edges = nil
-    global_shortest_path_length = Float::INFINITY
-    iteration_path_lengths = []
+    path_finder_goal_seek = run_path_finder_goal_seek
 
-    @num_iterations.times do
-      @ant_class.all.each do |ant|
-        # Make every ant execute one tour.
-        completed = true
+    presenter = PathFinderOutputPresenter.new(
+      path_finder_goal_seek,
+      include_path_length_vs_iteration: @include_path_length_vs_iteration
+    )
 
-        (0..@num_vertices - 2).each do |_i|
-          moved = ant.move_to_next_vertex
-
-          unless moved
-            completed = false
-            break
-          end
-        end
-
-        # Move ant back to start position.
-        ant.move_to_start if completed
-      end
-
-      # Find ant with shortest path.
-      ant_with_shortest_path = nil
-      shortest_path_edges = nil
-      shortest_path_length = Float::INFINITY
-      shortest_path_vertices = nil
-
-      @ant_class.all.each do |ant|
-        # If ant path is shorter than the currently shortest path and ant completed a full tour.
-        unless (path_length = ant.find_path_length) < shortest_path_length &&
-               (ant.visited_edge_ids.length == @num_vertices)
-          next
-        end
-
-        shortest_path_edges = ant.visited_edge_ids
-        shortest_path_vertices = ant.visited_vertex_ids
-        shortest_path_length = path_length
-        ant_with_shortest_path = ant
-      end
-
-      # Lay pheromones on the shortest path.
-      ant_with_shortest_path&.lay_pheromones
-
-      # Update trail densities.
-      @edge_class.update_trail_densities
-
-      # Reset ants to original positions.
-      @ant_class.reset_to_original_position
-
-      # Update global shortest path.
-      if shortest_path_length < global_shortest_path_length
-        global_shortest_path_length = shortest_path_length
-        global_shortest_path_edges = shortest_path_edges
-        global_shortest_path_vertices = shortest_path_vertices
-      end
-
-      iteration_path_lengths << shortest_path_length if @include_path_length_vs_iteration
-    end
-
-    output = { vertices: global_shortest_path_vertices, edges: global_shortest_path_edges,
-               path_length: global_shortest_path_length }
-
-    if global_shortest_path_length == Float::INFINITY
-      raise PathNotFoundError, 'Failed to find a tour. The graph may not have a valid path.'
-    end
-
-    output.merge!(iteration_path_lengths: iteration_path_lengths) if @include_path_length_vs_iteration
-
-    # Clear all database records to prevent memory leak with successive calls.
-    @ant_class.destroy_all
-    @edge_class.destroy_all
-    @vertex_class.destroy_all
-
-    output
+    destroy_graph
+    presenter.formatted_hash
   end
 
   private
@@ -276,5 +209,23 @@ class PathFinder
     ).execute
 
     nil
+  end
+
+  def run_path_finder_goal_seek(num_iterations, ants)
+    goal_seek = PathFinderGoalSeek.new(num_iterations, ants)
+    goal_seek.perform
+
+    if goal_seek.shortest_path_length == Float::INFINITY
+      raise PathNotFoundError, 'Failed to find a tour. The graph may not have a valid path.'
+    end
+
+    goal_seek
+  end
+
+  def destroy_graph
+    # Clear all database records to prevent memory leak with successive calls.
+    @ant_class.destroy_all
+    @edge_class.destroy_all
+    @vertex_class.destroy_all
   end
 end
