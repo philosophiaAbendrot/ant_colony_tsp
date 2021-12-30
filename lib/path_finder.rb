@@ -133,9 +133,7 @@ class PathFinder
   # Raises PathNotFoundError if there was a failure to find a trail. This
   #   may be because the graph has no Hamiltonian path.
   def execute
-    # Initialize graph.
     initialize_graph
-    # Initialize ants and place them on random vertices.
     initialize_ants
     path_finder_goal_seek = run_path_finder_goal_seek
 
@@ -150,13 +148,6 @@ class PathFinder
 
   private
 
-  # Internal: Converts a given hash to an equivalent hash in which all its
-  #   keys are symbols.
-  #
-  # h - A given Hash object.
-  #
-  # Returns a version of the given hash object in which all its keys have
-  #   been converted to symbols.
   def self.symbolize_keys(h)
     output = {}
     h.each do |k, v|
@@ -166,17 +157,10 @@ class PathFinder
     output
   end
 
-  # Internal: Initializes a graph using edge and vertex inputs provided on
-  #   invocation of 'execute' method.
-  #
-  # Returns generated graph object.
   def initialize_graph
     @graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
   end
 
-  # Internal: Initializes ants and places them on random vertices.
-  #
-  # Returns nothing.
   def initialize_ants
     AntInitializerService.new(
       ant_class: @ant_class,
