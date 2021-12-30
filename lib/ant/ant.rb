@@ -33,7 +33,6 @@ module Ant
     end
 
     class << self
-      attr_reader :vertex_class, :edge_class, :rand_gen
       # The amount of pheromone which is deposited by the ant which
       #   finds the shortest trail. This amount of pheromone is divided
       #   evenly among all the edges of the trail.
@@ -51,9 +50,6 @@ module Ant
       #
       # Returns nothing.
       def set_config(config)
-        @vertex_class = config.vertex_class
-        @edge_class = config.edge_class
-        @rand_gen = config.rand_gen
         @q = config.q
         @alpha = config.alpha
         @beta = config.beta
@@ -80,7 +76,7 @@ module Ant
     #
     # Returns the vertex object that the ant is currently on.
     def current_vertex
-      self.class.vertex_class.find(@current_vertex_id)
+      Graph::Vertex.find(@current_vertex_id)
     end
 
     # Internal: Returns the x_pos of the vertex that the ant is currently
@@ -134,7 +130,7 @@ module Ant
     #
     # Returns the total travel length.
     def find_path_length
-      @visited_edge_ids.map { |el| self.class.edge_class.find(el).cost_of_traversal }.sum
+      @visited_edge_ids.map { |el| Graph::Edge.find(el).cost_of_traversal }.sum
     end
 
     # Internal: Adds pheremones to all the edges that the ant travelled
@@ -143,7 +139,7 @@ module Ant
       trail_density = self.class.q / find_path_length
 
       visited_edges = @visited_edge_ids.map do |edge_id|
-        self.class.edge_class.find(edge_id)
+        Graph::Edge.find(edge_id)
       end
 
       visited_edges.each do |edge|
@@ -160,8 +156,7 @@ module Ant
         outgoing_edges: outgoing_edges,
         visited_vertex_ids: @visited_vertex_ids.dup,
         alpha: self.class.alpha,
-        beta: self.class.beta,
-        rand_gen: self.class.rand_gen
+        beta: self.class.beta
       )
     end
 
@@ -190,7 +185,7 @@ module Ant
 
     def outgoing_edges
       current_vertex.outgoing_edge_ids.map do |edge_id|
-        self.class.edge_class.find(edge_id)
+        Graph::Edge.find(edge_id)
       end
     end
 
