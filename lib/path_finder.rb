@@ -148,9 +148,8 @@ class PathFinder
 
   def initialize_ants
     AntInitializerService.new(
-      ant_class: Ant::Ant,
-      vertices: Graph::Vertex.all,
-      num_ants: @num_ants,
+      ants: Ant::Ant.all,
+      vertices: Graph::Vertex.all
     ).execute
 
     nil
