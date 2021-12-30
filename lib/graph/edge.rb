@@ -54,12 +54,7 @@ module Graph
     #
     # config - Object used to configure various classes.
     def self.set_config(config)
-      # Sets the vertex class.
-      @@vertex_class = config.vertex_class
-      # Coefficient which represents how quickly pheromone trails
-      #   evaporate.
       @@rho = config.rho
-      # Sets the initial pheromone density of all edges.
       @@initial_trail_density = config.initial_trail_density
     end
 
@@ -91,14 +86,14 @@ module Graph
     #
     # Returns the vertex object which the edge starts on.
     def start_vertex
-      @@vertex_class.find(@start_vertex_id)
+      Graph::Vertex.find(@start_vertex_id)
     end
 
     # Internal: Gets the end vertex of the edge.
     #
     # Returns the vertex object which the edge ends on.
     def end_vertex
-      @@vertex_class.find(@end_vertex_id)
+      Graph::Vertex.find(@end_vertex_id)
     end
 
     # Internal: Sets the delta trail density value.
