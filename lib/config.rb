@@ -32,21 +32,6 @@ class Config
   #   density which is deposited by the ant which finds the shortest trail.
   attr_accessor :q
 
-  # Internal: Gets/sets the class used to represent vertices.
-  attr_accessor :vertex_class
-
-  # Internal: Gets/sets the class used to represent edges.
-  attr_accessor :edge_class
-
-  # Internal: Gets/sets the class used to represent ants.
-  attr_accessor :ant_class
-
-  # Internal: Gets/sets the class used to generate random numbers.
-  attr_accessor :rand_gen
-
-  # Internal: Gets/sets the class used to represent a graph.
-  attr_accessor :graph_class
-
   # Internal: Initialize Config object.
   def initialize
     @num_ants = 30
@@ -56,11 +41,6 @@ class Config
     @beta = 1
     @initial_trail_density = 0.05
     @q = 100
-    @edge_class = Graph::Edge
-    @vertex_class = Graph::Vertex
-    @graph_class = Graph::Graph
-    @ant_class = Ant::Ant
-    @rand_gen = RandGen
   end
 
   # Internal: Fixes types of certain attributes of Config object.
