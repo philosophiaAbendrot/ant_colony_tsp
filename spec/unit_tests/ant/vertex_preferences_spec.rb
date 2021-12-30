@@ -18,7 +18,6 @@ describe Ant::VertexPreferences do
 
   let(:default_pheromone_density) { 3 }
   let(:config) { Config.new }
-  let(:rand_gen) { double('rand_gen', rand_float: 0.712) }
 
   before(:each) do
     generate_vertices(vertex_inputs)
@@ -66,7 +65,6 @@ describe Ant::VertexPreferences do
         outgoing_edges:     Graph::Edge.all,
         alpha:              config.alpha,
         beta:               config.beta,
-        rand_gen:           rand_gen
       )
 
       expect(
@@ -109,8 +107,8 @@ describe Ant::VertexPreferences do
         visited_vertex_ids: visited_vertex_ids,
         outgoing_edges:     Graph::Edge.all,
         alpha:              config.alpha,
-        beta:               config.beta,
-        rand_gen:           rand_gen)
+        beta:               config.beta
+      )
 
       expect(compare_array_of_floats(preferences.preference_mapping,
                                      cumulative_probability_mapping)).to be true
@@ -126,7 +124,6 @@ describe Ant::VertexPreferences do
         outgoing_edges:     Graph::Edge.all,
         alpha:              config.alpha,
         beta:               config.beta,
-        rand_gen:           rand_gen
       )
 
       expect(preferences.preference_mapping).to eq([])

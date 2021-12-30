@@ -13,7 +13,6 @@ RSpec.describe AntInitializerService do
     end
     let(:num_ants) { 10 }
     let(:rand_gen_result) { 1 }
-    let(:rand_gen) { double(rand_int: rand_gen_result) }
     let(:ant_instance) do
       instance_double(Ant::Ant, 'current_vertex_id=': nil)
     end
@@ -23,7 +22,6 @@ RSpec.describe AntInitializerService do
         ant_class: ant_class,
         vertices: vertices,
         num_ants: num_ants,
-        rand_gen: rand_gen
       ).execute
     end
 

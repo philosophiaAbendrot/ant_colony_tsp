@@ -3,7 +3,6 @@
 require 'bundler/setup'
 Bundler.require
 require_relative 'modules/databaseable'
-require_relative 'modules/rand_gen'
 require_relative 'ant/ant'
 require_relative 'ant/vertex_preferences'
 require_relative 'graph/graph'
@@ -36,7 +35,6 @@ class PathFinder
     @graph_class = config.graph_class
     @vertex_class = config.vertex_class
     @edge_class = config.edge_class
-    @rand_gen = config.rand_gen
     @num_iterations = config.num_iterations
 
     # Pass configuration to model classes.
@@ -157,7 +155,6 @@ class PathFinder
       ant_class: @ant_class,
       vertices: @vertex_class.all,
       num_ants: @num_ants,
-      rand_gen: @rand_gen
     ).execute
 
     nil

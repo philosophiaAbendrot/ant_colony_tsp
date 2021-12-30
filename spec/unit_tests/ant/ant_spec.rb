@@ -88,11 +88,9 @@ describe Ant::Ant do
        { id: 3, cost_of_traversal: 7.3, start_vertex_id: 1, end_vertex_id: 2 }]
     end
 
-    let(:mock_rand_gen) { double('rand_gen', rand_float: 0.5) }
     let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
     before(:each) do
-      config.rand_gen = mock_rand_gen
       config.process_configs
       Ant::Ant.set_config(config)
 
