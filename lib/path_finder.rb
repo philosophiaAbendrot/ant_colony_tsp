@@ -109,8 +109,8 @@ class PathFinder
   #     'execute' method.
   def self.execute(edge_inputs:, vertex_inputs:,
                    include_path_length_vs_iteration: false)
-    edge_inputs = edge_inputs.map { |el| symbolize_keys(el) }
-    vertex_inputs = vertex_inputs.map { |el| symbolize_keys(el) }
+    edge_inputs = edge_inputs.transform_keys!(&:to_sym)
+    vertex_inputs = vertex_inputs.transform_keys!(&:to_sym)
 
     new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs,
         include_path_length_vs_iteration: include_path_length_vs_iteration).execute
@@ -147,15 +147,6 @@ class PathFinder
   end
 
   private
-
-  def self.symbolize_keys(h)
-    output = {}
-    h.each do |k, v|
-      output[k.to_sym] = v
-    end
-
-    output
-  end
 
   def initialize_graph
     @graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
