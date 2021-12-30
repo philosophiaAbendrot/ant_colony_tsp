@@ -19,11 +19,9 @@ module Ant
   class VertexPreferences
     attr_reader :preference_mapping
 
-    def initialize(outgoing_edges:, visited_vertex_ids:, alpha:, beta:,
-                   rand_gen:)
+    def initialize(outgoing_edges:, visited_vertex_ids:, alpha:, beta:)
       total_preference = 0
       preference_mapping = []
-      @rand_gen = rand_gen
 
       total_preference, preference_mapping = compute_preference_mapping(
         prospective_edges(outgoing_edges, visited_vertex_ids),
@@ -40,13 +38,12 @@ module Ant
     end
 
     def select_rand_vertex
-      rand_num = @rand_gen.rand_float
       selected_vertex_id = nil
 
       (0..@preference_mapping.length - 1).each do |i|
         vertex_id, cumulative_probability = @preference_mapping[i]
 
-        if cumulative_probability >= rand_num
+        if cumulative_probability >= rand
           selected_vertex_id = vertex_id
           break
         end
