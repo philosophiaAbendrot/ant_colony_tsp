@@ -10,7 +10,7 @@ require_relative 'graph/graph'
 require_relative 'graph/edge'
 require_relative 'graph/vertex'
 require_relative 'services/ant_initializer_service'
-require_relative 'services/path_finder_goal_seek'
+require_relative 'services/optimized_path'
 require_relative 'services/path_finder_output_presenter'
 require_relative 'config'
 require_relative 'errors'
@@ -135,10 +135,10 @@ class PathFinder
   def execute
     initialize_graph
     initialize_ants
-    path_finder_goal_seek = run_path_finder_goal_seek
+    optimized_path = perform_path_optimization
 
     presenter = PathFinderOutputPresenter.new(
-      path_finder_goal_seek,
+      optimized_path,
       include_path_length_vs_iteration: @include_path_length_vs_iteration
     )
 
@@ -172,19 +172,18 @@ class PathFinder
     nil
   end
 
-  def run_path_finder_goal_seek
-    goal_seek = PathFinderGoalSeek.new(
+  def perform_path_optimization
+    optimized_path = OptimizedPath.new(
       ants:                             @ant_class.all,
       num_iterations:                   @num_iterations,
       num_vertices:                     @num_vertices,
       include_path_length_vs_iteration: @include_path_length_vs_iteration)
-    goal_seek.perform
 
-    if goal_seek.shortest_path_length == Float::INFINITY
+    if optimized_path.shortest_path_length == Float::INFINITY
       raise PathNotFoundError, 'Failed to find a tour. The graph may not have a valid path.'
     end
 
-    goal_seek
+    optimized_path
   end
 
   def destroy_graph

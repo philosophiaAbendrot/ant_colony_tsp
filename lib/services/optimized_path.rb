@@ -1,4 +1,6 @@
-class PathFinderGoalSeek
+# frozen_string_literal: true
+
+class OptimizedPath
   def initialize(ants:, num_iterations:, num_vertices:,
                  include_path_length_vs_iteration: false)
     @num_iterations                   = num_iterations
@@ -9,12 +11,7 @@ class PathFinderGoalSeek
     @num_vertices                     = num_vertices
     @include_path_length_vs_iteration = include_path_length_vs_iteration
     @iteration_path_lengths           = []
-  end
-
-  def perform
-    @num_iterations.times do
-      run_tour
-    end
+    optimize
   end
 
   def shortest_path_length
@@ -34,6 +31,12 @@ class PathFinderGoalSeek
   end
 
   private
+
+  def optimize
+    @num_iterations.times do
+      run_tour
+    end
+  end
 
   def run_tour
     scramble_ants
