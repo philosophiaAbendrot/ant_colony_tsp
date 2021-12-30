@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class OptimizedPath
+  attr_reader :shortest_path_length, :shortest_path_vertices,
+              :shortest_path_edges, :iteration_path_lengths
+
   def initialize(ants:, num_iterations:, num_vertices:,
                  include_path_length_vs_iteration: false)
     @num_iterations                   = num_iterations
@@ -12,22 +15,6 @@ class OptimizedPath
     @include_path_length_vs_iteration = include_path_length_vs_iteration
     @iteration_path_lengths           = []
     optimize
-  end
-
-  def shortest_path_length
-    @global_shortest_path_length.dup
-  end
-
-  def shortest_path_vertices
-    @global_shortest_path_vertices.dup
-  end
-
-  def shortest_path_edges
-    @global_shortest_path_edges.dup
-  end
-
-  def iteration_path_lengths
-    @iteration_path_lengths.dup
   end
 
   private
