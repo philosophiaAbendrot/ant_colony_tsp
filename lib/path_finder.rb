@@ -31,16 +31,12 @@ class PathFinder
     config = self.class.config
 
     @num_ants = config.num_ants
-    @ant_class = config.ant_class
-    @graph_class = config.graph_class
-    @vertex_class = config.vertex_class
-    @edge_class = config.edge_class
     @num_iterations = config.num_iterations
 
     # Pass configuration to model classes.
-    @edge_class.set_config(config)
-    @graph_class.set_config(config)
-    @ant_class.set_config(config)
+    Graph::Edge.set_config(config)
+    Graph::Graph.set_config(config)
+    Ant::Ant.set_config(config)
   end
 
   # Internal: Gets Config object associated with class.
@@ -147,13 +143,13 @@ class PathFinder
   private
 
   def initialize_graph
-    @graph = @graph_class.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
+    @graph = Graph::Graph.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
   end
 
   def initialize_ants
     AntInitializerService.new(
-      ant_class: @ant_class,
-      vertices: @vertex_class.all,
+      ant_class: Ant::Ant,
+      vertices: Graph::Vertex.all,
       num_ants: @num_ants,
     ).execute
 
@@ -162,7 +158,7 @@ class PathFinder
 
   def perform_path_optimization
     optimized_path = OptimizedPath.new(
-      ants:                             @ant_class.all,
+      ants:                             Graph::Ant.all,
       num_iterations:                   @num_iterations,
       num_vertices:                     @num_vertices,
       include_path_length_vs_iteration: @include_path_length_vs_iteration)
@@ -176,8 +172,8 @@ class PathFinder
 
   def destroy_graph
     # Clear all database records to prevent memory leak with successive calls.
-    @ant_class.destroy_all
-    @edge_class.destroy_all
-    @vertex_class.destroy_all
+    Ant::Ant.destroy_all
+    Graph::Edge.destroy_all
+    Graph::Vertex.destroy_all
   end
 end
