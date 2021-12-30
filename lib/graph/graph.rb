@@ -42,9 +42,6 @@ module Graph
     #
     # Returns nothing.
     def self.set_config(config)
-      @@vertex_class = config.vertex_class
-      @@edge_class = config.edge_class
-      # The pheromone density that all edges have initially.
       @@initial_trail_density = config.initial_trail_density
       @@rho = config.rho
 
@@ -71,14 +68,14 @@ module Graph
 
       edge_inputs.each do |edge_input|
         if edge_input.is_a?(Hash)
-          @@edge_class.new(edge_input)
+          Graph::Edge.new(edge_input)
         else
           raise ArgumentError, 'Edge input is not in hash format'
         end
       end
 
       # set initial trail densities
-      @@edge_class.initialize_trail_densities
+      Graph::Edge.initialize_trail_densities
 
       return
     end
@@ -101,7 +98,7 @@ module Graph
 
       vertex_inputs.each do |vertex_input|
         if vertex_input.is_a?(Hash)
-          @@vertex_class.new(vertex_input)
+          Graph::Vertex.new(vertex_input)
         else
           raise ArgumentError, 'Vertex input is not in hash format'
         end
@@ -115,7 +112,7 @@ module Graph
     #
     # Returns nothing.
     def connect_edges_with_vertices
-      @@edge_class.all.each do |edge|
+      Graph::Edge.all.each do |edge|
         edge.start_vertex.outgoing_edge_ids << edge.id
       end
 
