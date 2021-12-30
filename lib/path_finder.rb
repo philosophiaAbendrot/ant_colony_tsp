@@ -10,6 +10,8 @@ require_relative 'graph/graph'
 require_relative 'graph/edge'
 require_relative 'graph/vertex'
 require_relative 'services/ant_initializer_service'
+require_relative 'services/path_finder_goal_seek'
+require_relative 'services/path_finder_output_presenter'
 require_relative 'config'
 require_relative 'errors'
 
@@ -19,31 +21,6 @@ require_relative 'errors'
 #   Runs ant colony optimization logic.
 #   Exports data.
 class PathFinder
-  # Internal: Initializes AntColonyTsp class.
-  #
-  # edge_inputs - An Array of Hash objects containing information on the
-  #   edges in the graph.
-  # vertex_inputs - An Array of Hash objects containing information on
-  #   vertices in the graph.
-  # include_path_length_vs_iteration - A Boolean object which decides
-  #   whether data on the length of the trail for each iteration is included
-  #   in the output.
-  #
-  # Examples
-  #
-  # edge_inputs = [{ id: 2, start_vertex_id: 3, end_vertex_id: 4,
-  #                  cost_of_traversal: 44.13 },
-  #                { id: 5, start_vertex_id: 9, end_vertex_id: 3,
-  #                  cost_of_traversal: 39.52 }]
-  # vertex_inputs = [{ x_pos: 5.4, y_pos: -3.2, id: 3 },
-  #                  { x_pos: 8.3, y_pos: 6.5, id: 4 },
-  #                  { x_pos: -3.5, y_pos: -5.6, id: 9 }]
-  #
-  # instance = AntColonyTsp.new(edge_inputs: edge_inputs,
-  #                  vertex_inputs:vertex_inputs,
-  #                  include_path_length_vs_iteration: true)
-  #
-  # Returns nothing.
   def initialize(edge_inputs:, vertex_inputs:,
                  include_path_length_vs_iteration:)
 
@@ -211,8 +188,12 @@ class PathFinder
     nil
   end
 
-  def run_path_finder_goal_seek(num_iterations, ants)
-    goal_seek = PathFinderGoalSeek.new(num_iterations, ants)
+  def run_path_finder_goal_seek
+    goal_seek = PathFinderGoalSeek.new(
+      ants:                             @ant_class.all,
+      num_iterations:                   @num_iterations,
+      num_vertices:                     @num_vertices,
+      include_path_length_vs_iteration: @include_path_length_vs_iteration)
     goal_seek.perform
 
     if goal_seek.shortest_path_length == Float::INFINITY

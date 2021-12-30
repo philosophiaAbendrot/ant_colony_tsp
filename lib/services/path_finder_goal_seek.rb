@@ -1,10 +1,14 @@
 class PathFinderGoalSeek
-  def initialize(num_iterations, ants)
-    @num_iterations = num_iterations
-    @ants = ants
-    @global_shortest_path_length   = Float::INFINITY
-    @global_shortest_path_vertices = nil
-    @global_shortest_path_edges    = nil
+  def initialize(ants:, num_iterations:, num_vertices:,
+                 include_path_length_vs_iteration: false)
+    @num_iterations                   = num_iterations
+    @ants                             = ants
+    @global_shortest_path_length      = Float::INFINITY
+    @global_shortest_path_vertices    = nil
+    @global_shortest_path_edges       = nil
+    @num_vertices                     = num_vertices
+    @include_path_length_vs_iteration = include_path_length_vs_iteration
+    @iteration_path_lengths           = []
   end
 
   def perform
@@ -98,12 +102,12 @@ class PathFinderGoalSeek
     return unless ant_with_shortest_path
 
     ant_with_shortest_path.lay_pheromones
-    @edge_class.update_trail_densities
+    Graph::Edge.update_trail_densities
     true
   end
 
   def reset_to_original_position
-    @ant_class.reset_to_original_position
+    Ant::Ant.reset_to_original_position
   end
 
   def update_path_length_goal_seeking_history

@@ -26,6 +26,8 @@ class PathFinderOutputPresenter
   end
 
   def incorporate_iteration_path_lengths
-    @formatted_hash.merge!(@path_finder_goal_seek.iteration_path_lengths)
+    @formatted_hash.merge!(
+      iteration_path_lengths: @path_finder_goal_seek.iteration_path_lengths
+    )
   end
 end
