@@ -86,14 +86,14 @@ module Graph
     #
     # Returns the vertex object which the edge starts on.
     def start_vertex
-      Graph::Vertex.find(@start_vertex_id)
+      Vertex.find(@start_vertex_id)
     end
 
     # Internal: Gets the end vertex of the edge.
     #
     # Returns the vertex object which the edge ends on.
     def end_vertex
-      Graph::Vertex.find(@end_vertex_id)
+      Vertex.find(@end_vertex_id)
     end
 
     # Internal: Sets the delta trail density value.

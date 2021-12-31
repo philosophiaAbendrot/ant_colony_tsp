@@ -68,14 +68,14 @@ module Graph
 
       edge_inputs.each do |edge_input|
         if edge_input.is_a?(Hash)
-          Graph::Edge.new(edge_input)
+          Edge.new(edge_input)
         else
           raise ArgumentError, 'Edge input is not in hash format'
         end
       end
 
       # set initial trail densities
-      Graph::Edge.initialize_trail_densities
+      Edge.initialize_trail_densities
 
       return
     end
@@ -98,7 +98,7 @@ module Graph
 
       vertex_inputs.each do |vertex_input|
         if vertex_input.is_a?(Hash)
-          Graph::Vertex.new(vertex_input)
+          Vertex.new(vertex_input)
         else
           raise ArgumentError, 'Vertex input is not in hash format'
         end
@@ -112,7 +112,7 @@ module Graph
     #
     # Returns nothing.
     def connect_edges_with_vertices
-      Graph::Edge.all.each do |edge|
+      Edge.all.each do |edge|
         edge.start_vertex.outgoing_edge_ids << edge.id
       end
 
