@@ -24,7 +24,7 @@ describe Ant::Ant do
     Graph::Edge.destroy_all
   end
 
-  describe 'initialize' do
+  describe '#initialize' do
     before(:each) do
       Ant::Ant.set_config(config)
       Ant::Ant.new(initialize_params)
@@ -47,7 +47,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'current_vertex' do
+  describe '#current_vertex' do
     before(:each) do
       Ant::Ant.new(initialize_params)
     end
@@ -57,7 +57,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'x_pos' do
+  describe '#x_pos' do
     before(:each) do
       Ant::Ant.new(initialize_params)
     end
@@ -67,7 +67,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'y_pos' do
+  describe '#y_pos' do
     before(:each) do
       Ant::Ant.new(initialize_params)
     end
@@ -77,7 +77,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'move_to_next_city' do
+  describe '#move_to_next_vertex' do
     let(:vertex_inputs) do
       [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 },
        { id: 4, x_pos: 9.5, y_pos: 5 }]
@@ -87,10 +87,22 @@ describe Ant::Ant do
        { id: 2, cost_of_traversal: 9.5, start_vertex_id: 1, end_vertex_id: 4 },
        { id: 3, cost_of_traversal: 7.3, start_vertex_id: 1, end_vertex_id: 2 }]
     end
-
+    let(:next_vertex_id) { 2 }
+    let(:preferences_are_empty) { false }
+    let(:vertex_preference_double) do
+      instance_double(
+        Ant::VertexPreferences,
+        select_rand_vertex: next_vertex_id,
+        empty?:             preferences_are_empty
+      )
+    end
+    let(:current_vertex_id) { 1 }
     let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
     before(:each) do
+      allow(Ant::VertexPreferences).to receive(:new)
+        .and_return(vertex_preference_double)
+
       config.process_configs
       Ant::Ant.set_config(config)
 
@@ -99,9 +111,9 @@ describe Ant::Ant do
 
       # set up connections on the vertex the ant is on
       Ant::Ant.new(initialize_params)
-      Graph::Vertex.find(1).outgoing_edge_ids = [1, 2, 3]
-      ant.current_vertex_id = 1
-      ant.visited_vertex_ids = [1]
+      Graph::Vertex.find(current_vertex_id).outgoing_edge_ids = [1, 2, 3]
+      ant.current_vertex_id = current_vertex_id
+      ant.visited_vertex_ids = [current_vertex_id]
     end
 
     it 'should move to the correct vertex' do
@@ -134,31 +146,33 @@ describe Ant::Ant do
       # cumulative_prob += hashed_result[edge_3.end_vertex_id]
       # cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
 
-      expect(ant.current_vertex_id).to eq(4)
+      expect(ant.current_vertex_id).to eq(next_vertex_id)
     end
 
     it 'should return true to indicate that the ant moved successfully' do
       expect(ant.move_to_next_vertex).to be true
     end
 
-    it "should have '4' in its list of visited vertices" do
+    it "should have new vertex in its list of visited vertices" do
       ant.move_to_next_vertex
-      expect(ant.visited_vertex_ids.include?(4)).to be true
+      expect(ant.visited_vertex_ids).to include(next_vertex_id)
     end
 
-    it "should have '2' in its list of visited edges" do
+    it "should have start vertex in its list of visited edges" do
       ant.move_to_next_vertex
-      expect(ant.visited_edge_ids.include?(2)).to be true
+      expect(ant.visited_edge_ids).to include(3)
     end
 
     context 'if there is no connected vertex which has not been visited' do
+      let(:preferences_are_empty) { true }
+
       before(:each) do
         ant.visited_vertex_ids = [2, 3, 4]
       end
 
       it 'ant should not move' do
         ant.move_to_next_vertex
-        expect(ant.current_vertex_id).to eq(1)
+        expect(ant.current_vertex_id).to eq(current_vertex_id)
       end
 
       it 'should return false to indicate that ant did not move' do
@@ -168,7 +182,7 @@ describe Ant::Ant do
   end
 
   describe 'move_to_start' do
-    let(:vertex_inputs) do
+  let(:vertex_inputs) do
       [{ id: 0, x_pos: -18.14, y_pos: -19.13 }, { id: 1, x_pos: 16.25, y_pos: -9.67 },
        { id: 2, x_pos: -3.01, y_pos: 5.7 }, { id: 3, x_pos: -17.55, y_pos: -15.14 }, { id: 4, x_pos: 7.29, y_pos: 9.51 }]
     end
@@ -280,16 +294,14 @@ describe Ant::Ant do
        { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
        { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }]
     end
-    let(:mock_edge_class) { double('mock_edge_class', all: [mock_edge_1, mock_edge_2, mock_edge_3]) }
-    let(:mock_edge_1) { double('edge1', cost_of_traversal: 5.3) }
-    let(:mock_edge_2) { double('edge2', cost_of_traversal: 7.0) }
-    let(:mock_edge_3) { double('edge3', cost_of_traversal: 1.1) }
+    let(:mock_edge1) { double('edge1', cost_of_traversal: 5.3) }
+    let(:mock_edge2) { double('edge2', cost_of_traversal: 7.0) }
+    let(:mock_edge3) { double('edge3', cost_of_traversal: 1.1) }
     let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
     let(:q) { 5 }
 
     before(:each) do
       config.q = q
-      config.edge_class = mock_edge_class
       config.process_configs
 
       Ant::Ant.set_config(config)
@@ -298,9 +310,9 @@ describe Ant::Ant do
       generate_vertices(vertex_inputs)
       generate_edges(edge_inputs, config.initial_trail_density)
 
-      allow(mock_edge_class).to receive(:find).with(1).and_return(mock_edge_1)
-      allow(mock_edge_class).to receive(:find).with(2).and_return(mock_edge_2)
-      allow(mock_edge_class).to receive(:find).with(3).and_return(mock_edge_3)
+      allow(Graph::Edge).to receive(:find).with(1).and_return(mock_edge1)
+      allow(Graph::Edge).to receive(:find).with(2).and_return(mock_edge2)
+      allow(Graph::Edge).to receive(:find).with(3).and_return(mock_edge3)
 
       # set up connections on the vertex the ant is on
       vertex_1 = Graph::Vertex.find(1)
@@ -313,9 +325,9 @@ describe Ant::Ant do
 
     it 'should call add_pheromones with delta value Q/Lk on each edge' do
       expected_density = q.to_f / ant.find_path_length
-      expect(mock_edge_1).to receive(:add_pheromones).with(expected_density)
-      expect(mock_edge_2).to receive(:add_pheromones).with(expected_density)
-      expect(mock_edge_3).to receive(:add_pheromones).with(expected_density)
+      expect(mock_edge1).to receive(:add_pheromones).with(expected_density)
+      expect(mock_edge2).to receive(:add_pheromones).with(expected_density)
+      expect(mock_edge3).to receive(:add_pheromones).with(expected_density)
       ant.lay_pheromones
     end
   end
