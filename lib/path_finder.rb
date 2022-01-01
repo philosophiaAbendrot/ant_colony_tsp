@@ -103,8 +103,8 @@ class PathFinder
   #     'execute' method.
   def self.execute(edge_inputs:, vertex_inputs:,
                    include_path_length_vs_iteration: false)
-    edge_inputs = edge_inputs.transform_keys!(&:to_sym)
-    vertex_inputs = vertex_inputs.transform_keys!(&:to_sym)
+    edge_inputs = edge_inputs.map { |edge| edge.transform_keys!(&:to_sym) }
+    vertex_inputs = vertex_inputs.map { |vertex| vertex.transform_keys!(&:to_sym) }
 
     new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs,
         include_path_length_vs_iteration: include_path_length_vs_iteration).execute
@@ -148,8 +148,8 @@ class PathFinder
 
   def initialize_ants
     AntInitializerService.new(
-      ants: Ant::Ant.all,
-      vertices: Graph::Vertex.all
+      @num_ants,
+      Graph::Vertex.all
     ).execute
 
     nil
@@ -157,7 +157,7 @@ class PathFinder
 
   def perform_path_optimization
     optimized_path = OptimizedPath.new(
-      ants:                             Graph::Ant.all,
+      ants:                             Ant::Ant.all,
       num_iterations:                   @num_iterations,
       num_vertices:                     @num_vertices,
       include_path_length_vs_iteration: @include_path_length_vs_iteration)
