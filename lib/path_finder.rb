@@ -20,9 +20,18 @@ require_relative 'errors'
 #   Runs ant colony optimization logic.
 #   Exports data.
 class PathFinder
+  private
+
+  attr_reader :num_vertices, :edge_inputs, :vertex_inputs,
+              :include_path_length_vs_iteration, :num_ants,
+              :num_iterations, :graph
+
+  public
+
+  @config = nil
+
   def initialize(edge_inputs:, vertex_inputs:,
                  include_path_length_vs_iteration:)
-
     @num_vertices = vertex_inputs.length
     @edge_inputs = edge_inputs
     @vertex_inputs = vertex_inputs
@@ -44,8 +53,7 @@ class PathFinder
   # Returns Config object associated with class. If there is no associated
   #   Config object, it creates a new one.
   def self.config
-    @@config ||= Config.new
-    @@config
+    @config ||= Config.new
   end
 
   # Public: Exposes Config object, allowing user to configure it using a
@@ -105,9 +113,11 @@ class PathFinder
                    include_path_length_vs_iteration: false)
     edge_inputs = edge_inputs.map { |edge| edge.transform_keys!(&:to_sym) }
     vertex_inputs = vertex_inputs.map { |vertex| vertex.transform_keys!(&:to_sym) }
-
-    new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs,
-        include_path_length_vs_iteration: include_path_length_vs_iteration).execute
+    new(
+      edge_inputs:                      edge_inputs,
+      vertex_inputs:                    vertex_inputs,
+      include_path_length_vs_iteration: include_path_length_vs_iteration
+    ).execute
   end
 
   # Internal: Takes in inputs for vertices, edges, and other options for
@@ -129,13 +139,10 @@ class PathFinder
   def execute
     initialize_graph
     initialize_ants
-    optimized_path = perform_path_optimization
-
     presenter = PathFinderOutputPresenter.new(
       optimized_path,
-      include_path_length_vs_iteration: @include_path_length_vs_iteration
+      include_path_length_vs_iteration: include_path_length_vs_iteration
     )
-
     destroy_graph
     presenter.formatted_hash
   end
@@ -143,30 +150,27 @@ class PathFinder
   private
 
   def initialize_graph
-    @graph = Graph::Graph.new(edge_inputs: @edge_inputs, vertex_inputs: @vertex_inputs)
+    @graph = Graph::Graph.new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
   end
 
   def initialize_ants
     AntInitializerService.new(
-      @num_ants,
+      num_ants,
       Graph::Vertex.all
     ).execute
-
-    nil
   end
 
-  def perform_path_optimization
-    optimized_path = OptimizedPath.new(
+  def optimized_path
+    path = OptimizedPath.new(
       ants:                             Ant::Ant.all,
-      num_iterations:                   @num_iterations,
-      num_vertices:                     @num_vertices,
-      include_path_length_vs_iteration: @include_path_length_vs_iteration)
-
-    if optimized_path.shortest_path_length == Float::INFINITY
+      num_iterations:                   num_iterations,
+      num_vertices:                     num_vertices,
+      include_path_length_vs_iteration: include_path_length_vs_iteration
+    )
+    if path.shortest_path_length == Float::INFINITY
       raise PathNotFoundError, 'Failed to find a tour. The graph may not have a valid path.'
     end
-
-    optimized_path
+    path
   end
 
   def destroy_graph
