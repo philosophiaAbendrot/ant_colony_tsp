@@ -12,32 +12,38 @@ RSpec.describe AntInitializerService do
       [vertex1, vertex2]
     end
     let(:num_ants) { 10 }
-    let(:rand_gen_result) { 1 }
     let(:ant_instance) do
       instance_double(Ant::Ant, 'current_vertex_id=': nil)
     end
 
     subject(:result) do
       AntInitializerService.new(
-        ant_class: ant_class,
-        vertices: vertices,
-        num_ants: num_ants,
+        num_ants,
+        vertices
       ).execute
     end
 
+    before do
+      stub_const('Ant::Ant', ant_class)
+      allow_any_instance_of(described_class).to(
+        receive(:rand).and_return(rand_gen_result)
+      )
+    end
+
+    let(:rand_gen_result) { 1 }
+
     describe 'instantiates ants' do
       it 'instantiates the correct number of ants' do
-        allow(ant_class).to receive(:new).and_return(
+        expect(ant_class).to receive(:new).exactly(num_ants).times.and_return(
           ant_instance
         )
-        expect(ant_class).to receive(:new).exactly(num_ants).times
 
         result
       end
     end
 
     describe 'places ants' do
-      it 'places ants in random locations' do
+      it 'places ants in random locations', :aggregate_failures do
         random_current_vertex_id = vertices[rand_gen_result].id
 
         allow(ant_class).to receive(:new) do |args|
