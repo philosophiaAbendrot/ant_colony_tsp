@@ -121,7 +121,7 @@ describe Graph::Graph do
       end
       let(:edge1) do
         instance_double(
-          Graph::Edge, id: 1, start_vertex: vertex3
+          Graph::Edge, id: 1, start_vertex: vertex3,
           end_vertex_id: 4, cost_of_traversal: 5,
         )
       end
@@ -139,18 +139,14 @@ describe Graph::Graph do
       end
 
       it 'outgoing edge ids should be populated' do
-        vertex3 = Graph::Vertex.find(3)
-        vertex4 = Graph::Vertex.find(4)
+        expect(vertex3).to(
+          receive_message_chain(:outgoing_edge_ids, :<<).with(edge1.id)
+        )
 
-        expect(vertex3.outgoing_edge_ids).to eq([1])
-        expect(vertex4.outgoing_edge_ids).to eq([2])
+        expect(vertex4).to(
+          receive_message_chain(:outgoing_edge_ids, :<<).with(edge2.id)
+        )
 
-        expect(edge1).to receive_message_chain(
-          :start_vertex, :outgoing_edge_ids
-        ).with(1)
-        expect(edge1).to receive_message_chain(
-          :start_vertex, :outgoing_edge_ids
-        ).with(2)
         generate_graph
       end
     end
