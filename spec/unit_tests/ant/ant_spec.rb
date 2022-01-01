@@ -20,8 +20,6 @@ describe Ant::Ant do
 
   after(:each) do
     Ant::Ant.destroy_all
-    Graph::Vertex.destroy_all
-    Graph::Edge.destroy_all
   end
 
   describe '#initialize' do
@@ -78,47 +76,89 @@ describe Ant::Ant do
   end
 
   describe '#move_to_next_vertex' do
-    let(:vertex_inputs) do
-      [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 },
-       { id: 4, x_pos: 9.5, y_pos: 5 }]
+    let(:vertex1) do
+      instance_double(
+        Graph::Vertex, id: 1, x_pos: 5.3, y_pos: 8.9,
+        outgoing_edge_ids: [1, 2, 3]
+      )
     end
-    let(:edge_inputs) do
-      [{ id: 1, cost_of_traversal: 4.6, start_vertex_id: 1, end_vertex_id: 3 },
-       { id: 2, cost_of_traversal: 9.5, start_vertex_id: 1, end_vertex_id: 4 },
-       { id: 3, cost_of_traversal: 7.3, start_vertex_id: 1, end_vertex_id: 2 }]
+    let(:vertex2) do
+      instance_double(Graph::Vertex, id: 2, x_pos: -8.4, y_pos: 7.2)
     end
+    let(:vertex3) do
+      instance_double(Graph::Vertex, id: 3, x_pos: -4, y_pos: -6)
+    end
+    let(:vertex4) do
+      instance_double(Graph::Vertex, id: 4, x_pos: 9.5, y_pos: 5)
+    end
+    let(:vertex_class) { class_double(Graph::Vertex, destroy_all: nil) }
+
+    let(:edge1) do
+      instance_double(
+        Graph::Edge,
+        id: 1, cost_of_traversal: 4.6,
+        start_vertex_id: 1, end_vertex_id: 3
+      )
+    end
+    let(:edge2) do
+      instance_double(
+        Graph::Edge,
+        id: 2, cost_of_traversal: 9.5,
+        start_vertex_id: 1, end_vertex_id: 4
+      )
+    end
+    let(:edge3) do
+      instance_double(
+        Graph::Edge,
+        id: 3, cost_of_traversal: 7.3,
+        start_vertex_id: 1, end_vertex_id: 2
+      )
+    end
+    let(:edge_class) { class_double(Graph::Edge, destroy_all: nil) }
+
     let(:next_vertex_id) { 2 }
     let(:preferences_are_empty) { false }
-    let(:vertex_preference_double) do
+    let(:vertex_pref_inst) do
       instance_double(
         Ant::VertexPreferences,
         select_rand_vertex: next_vertex_id,
         empty?:             preferences_are_empty
       )
     end
+    let(:vertex_pref_class) do
+      class_double(
+        Ant::VertexPreferences,
+        new: vertex_pref_inst
+      )
+    end
     let(:current_vertex_id) { 1 }
     let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
-
-    before(:each) do
-      allow(Ant::VertexPreferences).to receive(:new)
-        .and_return(vertex_preference_double)
-
+    let!(:ant) do
       config.process_configs
       Ant::Ant.set_config(config)
-
-      generate_vertices(vertex_inputs)
-      generate_edges(edge_inputs, config.initial_trail_density)
-
-      # set up connections on the vertex the ant is on
-      Ant::Ant.new(initialize_params)
-      Graph::Vertex.find(current_vertex_id).outgoing_edge_ids = [1, 2, 3]
+      ant = Ant::Ant.new(initialize_params)
       ant.current_vertex_id = current_vertex_id
       ant.visited_vertex_ids = [current_vertex_id]
+      ant
+    end
+    let(:edge_class) { class_double(Graph::Edge) }
+
+    before(:each) do
+      allow(edge_class).to receive(:find).with(1).and_return(edge1)
+      allow(edge_class).to receive(:find).with(2).and_return(edge2)
+      allow(edge_class).to receive(:find).with(3).and_return(edge3)
+      stub_const('Graph::Edge', edge_class)
+
+      allow(vertex_class).to receive(:find).with(1).and_return(vertex1)
+      allow(vertex_class).to receive(:find).with(2).and_return(vertex2)
+      allow(vertex_class).to receive(:find).with(3).and_return(vertex3)
+      allow(vertex_class).to receive(:find).with(4).and_return(vertex4)
+      stub_const('Graph::Vertex', vertex_class)
+
+      stub_const('Ant::VertexPreferences', vertex_pref_class)
     end
 
-    it 'should move to the correct vertex' do
-      ant.move_to_next_vertex
-
+    it 'moves to the correct vertex' do
       # calculate what answer should be
       # edge_1 = Graph::Edge.find(1)
       # tau_1_3 = (edge_1.trail_density)**AntColonyTsp::ALPHA_VALUE
@@ -145,25 +185,25 @@ describe Ant::Ant do
 
       # cumulative_prob += hashed_result[edge_3.end_vertex_id]
       # cumulative_probability_mapping << [edge_3.end_vertex_id, cumulative_prob]
-
+      ant.move_to_next_vertex
       expect(ant.current_vertex_id).to eq(next_vertex_id)
     end
 
-    it 'should return true to indicate that the ant moved successfully' do
+    it 'returns true to indicate that the ant moved successfully' do
       expect(ant.move_to_next_vertex).to be true
     end
 
-    it "should have new vertex in its list of visited vertices" do
+    it 'has new vertex in its list of visited vertices' do
       ant.move_to_next_vertex
       expect(ant.visited_vertex_ids).to include(next_vertex_id)
     end
 
-    it "should have start vertex in its list of visited edges" do
+    it 'should have start vertex in its list of visited edges' do
       ant.move_to_next_vertex
       expect(ant.visited_edge_ids).to include(3)
     end
 
-    context 'if there is no connected vertex which has not been visited' do
+    context 'if there is no unvisited adjacent vertex' do
       let(:preferences_are_empty) { true }
 
       before(:each) do
@@ -176,6 +216,7 @@ describe Ant::Ant do
       end
 
       it 'should return false to indicate that ant did not move' do
+        ant.move_to_next_vertex
         expect(ant.move_to_next_vertex).to be false
       end
     end
