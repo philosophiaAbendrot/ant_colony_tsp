@@ -223,35 +223,91 @@ describe Ant::Ant do
   end
 
   describe 'move_to_start' do
-  let(:vertex_inputs) do
-      [{ id: 0, x_pos: -18.14, y_pos: -19.13 }, { id: 1, x_pos: 16.25, y_pos: -9.67 },
-       { id: 2, x_pos: -3.01, y_pos: 5.7 }, { id: 3, x_pos: -17.55, y_pos: -15.14 }, { id: 4, x_pos: 7.29, y_pos: 9.51 }]
+    let(:vertex1) do
+      instance_double(
+        Graph::Vertex, id: 1, x_pos: 5.3, y_pos: 8.9,
+        outgoing_edge_ids: [1]
+      )
     end
-    let(:edge_inputs) do
-      [{ id: 0, start_vertex_id: 0, end_vertex_id: 1, cost_of_traversal: 35.66740388646193 },
-       { id: 1, start_vertex_id: 0, end_vertex_id: 2, cost_of_traversal: 29.076550689516115 }, { id: 2, start_vertex_id: 0, end_vertex_id: 3, cost_of_traversal: 4.033385674591507 }, { id: 3, start_vertex_id: 0, end_vertex_id: 4, cost_of_traversal: 38.30058093554195 }, { id: 4, start_vertex_id: 1, end_vertex_id: 0, cost_of_traversal: 35.66740388646193 }, { id: 5, start_vertex_id: 1, end_vertex_id: 2, cost_of_traversal: 24.641114017024474 }, { id: 6, start_vertex_id: 1, end_vertex_id: 3, cost_of_traversal: 34.23975613230912 }, { id: 7, start_vertex_id: 1, end_vertex_id: 4, cost_of_traversal: 21.169648083990438 }, { id: 8, start_vertex_id: 2, end_vertex_id: 0, cost_of_traversal: 29.076550689516115 }, { id: 9, start_vertex_id: 2, end_vertex_id: 1, cost_of_traversal: 24.641114017024474 }, { id: 10, start_vertex_id: 2, end_vertex_id: 3, cost_of_traversal: 25.410966136689886 }, { id: 11, start_vertex_id: 2, end_vertex_id: 4, cost_of_traversal: 10.982080859290738 }, { id: 12, start_vertex_id: 3, end_vertex_id: 0, cost_of_traversal: 4.033385674591507 }, { id: 13, start_vertex_id: 3, end_vertex_id: 1, cost_of_traversal: 34.23975613230912 }, { id: 14, start_vertex_id: 3, end_vertex_id: 2, cost_of_traversal: 25.410966136689886 }, { id: 15, start_vertex_id: 3, end_vertex_id: 4, cost_of_traversal: 34.99497249606006 }, { id: 16, start_vertex_id: 4, end_vertex_id: 0, cost_of_traversal: 38.30058093554195 }, { id: 17, start_vertex_id: 4, end_vertex_id: 1, cost_of_traversal: 21.169648083990438 }, { id: 18, start_vertex_id: 4, end_vertex_id: 2, cost_of_traversal: 10.982080859290738 }, { id: 19, start_vertex_id: 4, end_vertex_id: 3, cost_of_traversal: 34.99497249606006 }]
+    let(:vertex2) do
+      instance_double(
+        Graph::Vertex, id: 2, x_pos: -8.4, y_pos: 7.2,
+        outgoing_edge_ids: [2]
+      )
     end
-    let(:current_vertex_id) { 4 }
-    let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
-    let(:move_ant) { ant.move_to_start }
+    let(:vertex3) do
+      instance_double(
+        Graph::Vertex, id: 3, x_pos: -4, y_pos: -6,
+        outgoing_edge_ids: [3, 4]
+      )
+    end
+    let(:vertex_class) { class_double(Graph::Vertex, destroy_all: nil) }
 
-    before(:each) do
-      generate_vertices(vertex_inputs)
-      generate_edges(edge_inputs, config.initial_trail_density)
-      Ant::Ant.new(initialize_params)
-      Graph::Vertex.find(4).outgoing_edge_ids = [16, 17, 18, 19]
-      ant.visited_vertex_ids = [0, 1, 2, 3, 4]
-      ant.visited_edge_ids = [0, 5, 10, 15]
+    let(:edge1) do
+      instance_double(
+        Graph::Edge,
+        id: 1, cost_of_traversal: 4.6,
+        start_vertex_id: 1, end_vertex_id: 2
+      )
+    end
+    let(:edge2) do
+      instance_double(
+        Graph::Edge,
+        id: 2, cost_of_traversal: 9.5,
+        start_vertex_id: 2, end_vertex_id: 3
+      )
+    end
+    let(:edge3) do
+      instance_double(
+        Graph::Edge,
+        id: 3, cost_of_traversal: 7.3,
+        start_vertex_id: 3, end_vertex_id: 1
+      )
+    end
+    let(:edge4) do
+      instance_double(
+        Graph::Edge,
+        id: 4, cost_of_traversal: 4.0,
+        start_vertex_id: 3, end_vertex_id: 2
+      )
+    end
+    let(:edge_class) { class_double(Graph::Edge, destroy_all: nil) }
+
+    let(:edge_which_connects_to_first_vertex) { 3 }
+    let(:current_vertex_id)                   { 3 }
+    let(:start_vertex_id)                     { 1 }
+    let(:visited_vertex_ids)                  { [1, 2, 3] }
+    let(:visited_edge_ids)                    { [1, 2] }
+    let!(:ant) do
+      ant = Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
+      ant.visited_vertex_ids = visited_vertex_ids
+      ant.visited_edge_ids   = visited_edge_ids
+      ant
+    end
+
+    subject(:move_ant) { ant.move_to_start }
+
+    before do
+      allow(vertex_class).to receive(:find).with(1).and_return(vertex1)
+      allow(vertex_class).to receive(:find).with(2).and_return(vertex2)
+      allow(vertex_class).to receive(:find).with(3).and_return(vertex3)
+
+      allow(edge_class).to receive(:find).with(1).and_return(edge1)
+      allow(edge_class).to receive(:find).with(2).and_return(edge2)
+      allow(edge_class).to receive(:find).with(3).and_return(edge3)
+      allow(edge_class).to receive(:find).with(4).and_return(edge4)
+
+      stub_const('Graph::Vertex', vertex_class)
+      stub_const('Graph::Edge', edge_class)
     end
 
     it 'should move to the correct vertex' do
-      result = move_ant
-      expect(ant.current_vertex).to eq(Graph::Vertex.find(0))
+      move_ant
+      expect(ant.current_vertex_id).to eq(start_vertex_id)
     end
 
     it 'should return true to indicate that the ant moved successfully' do
-      result = move_ant
-      expect(result).to be true
+      is_expected.to be true
     end
 
     it 'should have the first vertex twice in its list of visited vertices' do
@@ -259,19 +315,21 @@ describe Ant::Ant do
       expect(ant.visited_vertex_ids[0]).to eq(ant.visited_vertex_ids[-1])
     end
 
-    it 'should have the edge that connects the last vertex to the first vertex in its list of visited edges' do
+    it 'should have the edge that connects the last vertex to the first'\
+       'vertex in its list of visited edges' do
       move_ant
-      expect(ant.visited_edge_ids[-1]).to eq(16)
+      expect(ant.visited_edge_ids[-1]).to eq(
+        edge_which_connects_to_first_vertex
+      )
     end
 
     context 'if there is no connected vertex which has not been visited' do
-      let(:edge_inputs) do
-        [{ id: 0, start_vertex_id: 0, end_vertex_id: 1, cost_of_traversal: 35.66740388646193 },
-         { id: 1, start_vertex_id: 0, end_vertex_id: 2, cost_of_traversal: 29.076550689516115 }, { id: 2, start_vertex_id: 0, end_vertex_id: 3, cost_of_traversal: 4.033385674591507 }, { id: 3, start_vertex_id: 0, end_vertex_id: 4, cost_of_traversal: 38.30058093554195 }, { id: 4, start_vertex_id: 1, end_vertex_id: 0, cost_of_traversal: 35.66740388646193 }, { id: 5, start_vertex_id: 1, end_vertex_id: 2, cost_of_traversal: 24.641114017024474 }, { id: 6, start_vertex_id: 1, end_vertex_id: 3, cost_of_traversal: 34.23975613230912 }, { id: 7, start_vertex_id: 1, end_vertex_id: 4, cost_of_traversal: 21.169648083990438 }, { id: 8, start_vertex_id: 2, end_vertex_id: 0, cost_of_traversal: 29.076550689516115 }, { id: 9, start_vertex_id: 2, end_vertex_id: 1, cost_of_traversal: 24.641114017024474 }, { id: 10, start_vertex_id: 2, end_vertex_id: 3, cost_of_traversal: 25.410966136689886 }, { id: 11, start_vertex_id: 2, end_vertex_id: 4, cost_of_traversal: 10.982080859290738 }, { id: 12, start_vertex_id: 3, end_vertex_id: 0, cost_of_traversal: 4.033385674591507 }, { id: 13, start_vertex_id: 3, end_vertex_id: 1, cost_of_traversal: 34.23975613230912 }, { id: 14, start_vertex_id: 3, end_vertex_id: 2, cost_of_traversal: 25.410966136689886 }, { id: 15, start_vertex_id: 3, end_vertex_id: 4, cost_of_traversal: 34.99497249606006 }, { id: 17, start_vertex_id: 4, end_vertex_id: 1, cost_of_traversal: 21.169648083990438 }, { id: 18, start_vertex_id: 4, end_vertex_id: 2, cost_of_traversal: 10.982080859290738 }, { id: 19, start_vertex_id: 4, end_vertex_id: 3, cost_of_traversal: 34.99497249606006 }]
-      end
-
-      before(:each) do
-        Graph::Vertex.find(4).outgoing_edge_ids = [17, 18, 19]
+      let(:edge3) { nil }
+      let(:vertex3) do
+        instance_double(
+          Graph::Vertex, id: 3, x_pos: -4, y_pos: -6,
+          outgoing_edge_ids: [4]
+        )
       end
 
       it 'ant should not move' do
@@ -281,16 +339,16 @@ describe Ant::Ant do
 
       it 'should not change visited vertex ids' do
         move_ant
-        expect(ant.visited_vertex_ids).to eq([0, 1, 2, 3, 4])
+        expect(ant.visited_vertex_ids).to eq(visited_vertex_ids)
       end
 
       it 'should not change visited edge ids' do
         move_ant
-        expect(ant.visited_edge_ids).to eq([0, 5, 10, 15])
+        expect(ant.visited_edge_ids).to eq(visited_edge_ids)
       end
 
       it 'should return false to indicate that the ant did not move' do
-        expect(move_ant).to be false
+        is_expected.to be false
       end
     end
   end

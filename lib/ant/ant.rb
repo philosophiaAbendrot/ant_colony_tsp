@@ -9,22 +9,10 @@ module Ant
     # Logic which stores instances and allow them to be searched.
     extend Databaseable
 
-    # Internal: Gets/sets the id of the vertex the ant is currently on.
     attr_accessor :current_vertex_id
-    #
-    # Internal: Gets/sets the list of ids of the vertices that the ant has
-    #   visited.
     attr_accessor :visited_vertex_ids
-    #
-    # Internal: Gets/sets the list of ids of the edges that the ant has
-    #   visited.
     attr_accessor :visited_edge_ids
 
-    # Internal: Initialize ant
-    #
-    # current_vertex_id: The Integer id of the vertex that the ant starts
-    #   on.
-    # id - The Integer id of the ant.
     def initialize(id:, current_vertex_id: nil)
       @id = id
       @current_vertex_id = current_vertex_id
@@ -72,35 +60,18 @@ module Ant
       end
     end
 
-    # Internal: Return the vertex that the ant object is currently on.
-    #
-    # Returns the vertex object that the ant is currently on.
     def current_vertex
       Graph::Vertex.find(@current_vertex_id)
     end
 
-    # Internal: Returns the x_pos of the vertex that the ant is currently
-    #   on.
-    #
-    # Returns the x_pos of the vertex that the ant is currently on.
     def x_pos
       current_vertex.x_pos
     end
 
-    # Internal: Returns the y_pos of the vertex that the ant is currently
-    #   on.
-    #
-    # Returns the x_pos of the vertex that the ant is currently on.
     def y_pos
       current_vertex.y_pos
     end
 
-    # Internal: Makes the ant select a vertex to move to and move to it.
-    #
-    # Returns true if the ant successfully moved to the next vertex.
-    #   Returns false if the ant has reached a dead end and cannot
-    #   move. This can occur if there are no outgoing edges to vertice
-    #   that haven't been visited, or if all vertices have been visited.
     def move_to_next_vertex
       selected_vertex_id, selected_edge_id = find_next_edge_and_vertex
       return false if selected_vertex_id.nil?
@@ -109,13 +80,6 @@ module Ant
       true
     end
 
-    # Internal: Returns an ant to the vertex that it started on if
-    #   that vertex is directly connected to the current vertex.
-    #   This method is used to return the ant to the starting
-    #   vertex after it has visited every vertex.
-    #
-    # Returns true if the ant is successfully moved to its starting
-    #   vertex and false otherwise.
     def move_to_start
       start_vertex_id = @visited_vertex_ids[0]
       selected_edge_id = find_edge_to_start_vertex(start_vertex_id)
@@ -125,16 +89,10 @@ module Ant
       true
     end
 
-    # Internal: Calculates and returns the total path length of the path
-    #   that the ant travelled starting from the start vertex.
-    #
-    # Returns the total travel length.
     def find_path_length
       @visited_edge_ids.map { |el| Graph::Edge.find(el).cost_of_traversal }.sum
     end
 
-    # Internal: Adds pheremones to all the edges that the ant travelled
-    #   through on its path.
     def lay_pheromones
       trail_density = self.class.q / find_path_length
 
