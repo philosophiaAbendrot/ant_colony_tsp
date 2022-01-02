@@ -10,43 +10,39 @@ describe Ant::Ant do
   let(:ant_id) { 1 }
   let(:config) { Config.new.process_configs }
   let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
-  let(:ant) { Ant::Ant.find(ant_id) }
 
-  before(:each) do
-    Graph::Graph.set_config(config)
-    Graph::Edge.set_config(config)
+  before do
     Ant::Ant.set_config(config)
   end
 
-  after(:each) do
+  after do
     Ant::Ant.destroy_all
   end
 
   describe '#initialize' do
-    before(:each) do
+    subject(:ant) do
       Ant::Ant.set_config(config)
       Ant::Ant.new(initialize_params)
     end
 
-    it 'ant should be initialized' do
-      expect(ant).to_not be nil
-    end
+    it { is_expected.not_to be nil }
 
-    it 'should set current vertex id to the value in the parameters' do
+    it 'sets current vertex id to the value in the parameters' do
       expect(ant.current_vertex_id).to eq current_vertex_id
     end
 
-    it 'should initialize visited edge ids to be a blank array' do
+    it 'initializes visited edge ids to be a blank array' do
       expect(ant.visited_edge_ids).to eq []
     end
 
-    it 'should initialize visited vertex ids to an array that includes just the current_vertex_id' do
+    it 'initializes visited vertex ids to an array that includes just'\
+       'the current_vertex_id' do
       expect(ant.visited_vertex_ids).to eq [current_vertex_id]
     end
   end
 
   describe '#current_vertex' do
-    before(:each) do
+    subject(:ant) do
       Ant::Ant.new(initialize_params)
     end
 
@@ -56,7 +52,7 @@ describe Ant::Ant do
   end
 
   describe '#x_pos' do
-    before(:each) do
+    subject(:ant) do
       Ant::Ant.new(initialize_params)
     end
 
@@ -66,7 +62,7 @@ describe Ant::Ant do
   end
 
   describe '#y_pos' do
-    before(:each) do
+    subject(:ant) do
       Ant::Ant.new(initialize_params)
     end
 
@@ -133,7 +129,7 @@ describe Ant::Ant do
     end
     let(:current_vertex_id) { 1 }
     let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
-    let!(:ant) do
+    subject(:ant) do
       config.process_configs
       Ant::Ant.set_config(config)
       ant = Ant::Ant.new(initialize_params)
@@ -222,7 +218,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'move_to_start' do
+  describe '#move_to_start' do
     let(:vertex1) do
       instance_double(
         Graph::Vertex, id: 1, x_pos: 5.3, y_pos: 8.9,
@@ -278,14 +274,13 @@ describe Ant::Ant do
     let(:start_vertex_id)                     { 1 }
     let(:visited_vertex_ids)                  { [1, 2, 3] }
     let(:visited_edge_ids)                    { [1, 2] }
-    let!(:ant) do
+
+    subject(:ant) do
       ant = Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
       ant.visited_vertex_ids = visited_vertex_ids
       ant.visited_edge_ids   = visited_edge_ids
       ant
     end
-
-    subject(:move_ant) { ant.move_to_start }
 
     before do
       allow(vertex_class).to receive(:find).with(1).and_return(vertex1)
@@ -302,22 +297,22 @@ describe Ant::Ant do
     end
 
     it 'should move to the correct vertex' do
-      move_ant
+      ant.move_to_start
       expect(ant.current_vertex_id).to eq(start_vertex_id)
     end
 
     it 'should return true to indicate that the ant moved successfully' do
-      is_expected.to be true
+      expect(ant.move_to_start).to be true
     end
 
     it 'should have the first vertex twice in its list of visited vertices' do
-      move_ant
+      ant.move_to_start
       expect(ant.visited_vertex_ids[0]).to eq(ant.visited_vertex_ids[-1])
     end
 
     it 'should have the edge that connects the last vertex to the first'\
        'vertex in its list of visited edges' do
-      move_ant
+      ant.move_to_start
       expect(ant.visited_edge_ids[-1]).to eq(
         edge_which_connects_to_first_vertex
       )
@@ -333,27 +328,27 @@ describe Ant::Ant do
       end
 
       it 'ant should not move' do
-        move_ant
+        ant.move_to_start
         expect(ant.current_vertex_id).to eq(current_vertex_id)
       end
 
       it 'should not change visited vertex ids' do
-        move_ant
+        ant.move_to_start
         expect(ant.visited_vertex_ids).to eq(visited_vertex_ids)
       end
 
       it 'should not change visited edge ids' do
-        move_ant
+        ant.move_to_start
         expect(ant.visited_edge_ids).to eq(visited_edge_ids)
       end
 
       it 'should return false to indicate that the ant did not move' do
-        is_expected.to be false
+        expect(ant.move_to_start).to be false
       end
     end
   end
 
-  describe 'find_path_length' do
+  describe '#find_path_length' do
     let(:vertex_inputs) do
       [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }]
     end
