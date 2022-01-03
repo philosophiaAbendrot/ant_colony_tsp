@@ -351,17 +351,20 @@ describe Ant::Ant do
   describe '#find_path_length' do
     let(:edge1) do
       instance_double(
-        Graph::Edge, id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2
+        Graph::Edge, id: 1, cost_of_traversal: 5.3,
+        start_vertex_id: 1, end_vertex_id: 2
       )
     end
     let(:edge2) do
       instance_double(
-        Graph::Edge, id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3
+        Graph::Edge, id: 2, cost_of_traversal: 7.0,
+        start_vertex_id: 2, end_vertex_id: 3
       )
     end
     let(:edge3) do
       instance_double(
-        Graph::Edge, id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1
+        Graph::Edge, id: 3, cost_of_traversal: 1.1,
+        start_vertex_id: 3, end_vertex_id: 1
       )
     end
     let(:edge_class) { class_double('Graph::Edge') }
@@ -394,48 +397,58 @@ describe Ant::Ant do
   end
 
   describe 'lay_phermones' do
-    let(:vertex_inputs) do
-      [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }]
-    end
     let(:edge_inputs) do
       [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
        { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
        { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }]
     end
-    let(:mock_edge1) { double('edge1', cost_of_traversal: 5.3) }
-    let(:mock_edge2) { double('edge2', cost_of_traversal: 7.0) }
-    let(:mock_edge3) { double('edge3', cost_of_traversal: 1.1) }
-    let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
+    let(:edge1) do
+      instance_double('edge1', id: 1, cost_of_traversal: 5.3,
+                      start_vertex_id: 1, end_vertex_id: 2)
+    end
+    let(:edge2) do
+      instance_double('edge2', id: 2, cost_of_traversal: 7.0,
+                      start_vertex_id: 2, end_vertex_id: 3)
+    end
+    let(:edge3) do
+      instance_double('edge3', id: 3, cost_of_traversal: 1.1,
+                      start_vertex_id: 3, end_vertex_id: 1)
+    end
+    let(:edge_class) { class_double('Graph::Edge') }
+    
     let(:q) { 5 }
+    let(:visited_edge_ids)   { [1, 2, 3] }
+    let(:visited_vertex_ids) { [1, 2, 3] }
 
-    before(:each) do
+    before do
+      stub_const('Graph::Edge', edge_class)
+
       config.q = q
       config.process_configs
-
       Ant::Ant.set_config(config)
-      Ant::Ant.new(initialize_params)
 
-      generate_vertices(vertex_inputs)
-      generate_edges(edge_inputs, config.initial_trail_density)
+      allow(edge_class).to receive(:find).with(1).and_return(edge1)
+      allow(edge_class).to receive(:find).with(2).and_return(edge2)
+      allow(edge_class).to receive(:find).with(3).and_return(edge3)
+    end
 
-      allow(Graph::Edge).to receive(:find).with(1).and_return(mock_edge1)
-      allow(Graph::Edge).to receive(:find).with(2).and_return(mock_edge2)
-      allow(Graph::Edge).to receive(:find).with(3).and_return(mock_edge3)
-
-      # set up connections on the vertex the ant is on
-      vertex_1 = Graph::Vertex.find(1)
-      vertex_1.outgoing_edge_ids = [1, 2, 3]
-
-      ant.current_vertex_id = 1
-      ant.visited_vertex_ids = [1, 2, 3]
-      ant.visited_edge_ids = [1, 2, 3]
+    subject(:ant) do
+      Ant::Ant.new(
+        current_vertex_id: current_vertex_id, id: ant_id
+      ).tap do |ant|
+        ant.visited_vertex_ids = visited_vertex_ids
+        ant.visited_edge_ids   = visited_edge_ids
+      end
     end
 
     it 'should call add_pheromones with delta value Q/Lk on each edge' do
-      expected_density = q.to_f / ant.find_path_length
-      expect(mock_edge1).to receive(:add_pheromones).with(expected_density)
-      expect(mock_edge2).to receive(:add_pheromones).with(expected_density)
-      expect(mock_edge3).to receive(:add_pheromones).with(expected_density)
+      path_length = [edge1, edge2, edge3].reduce(0) do |sum, edge|
+        sum + edge.cost_of_traversal
+      end
+      expected_density = q.to_f / path_length
+      expect(edge1).to receive(:add_pheromones).with(expected_density)
+      expect(edge2).to receive(:add_pheromones).with(expected_density)
+      expect(edge3).to receive(:add_pheromones).with(expected_density)
       ant.lay_pheromones
     end
   end
