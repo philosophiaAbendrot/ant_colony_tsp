@@ -132,10 +132,10 @@ describe Ant::Ant do
     subject(:ant) do
       config.process_configs
       Ant::Ant.set_config(config)
-      ant = Ant::Ant.new(initialize_params)
-      ant.current_vertex_id = current_vertex_id
-      ant.visited_vertex_ids = [current_vertex_id]
-      ant
+      Ant::Ant.new(initialize_params).tap do |ant|
+        ant.current_vertex_id  = current_vertex_id
+        ant.visited_vertex_ids = [current_vertex_id]
+      end
     end
     let(:edge_class) { class_double(Graph::Edge) }
 
@@ -276,10 +276,10 @@ describe Ant::Ant do
     let(:visited_edge_ids)                    { [1, 2] }
 
     subject(:ant) do
-      ant = Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
-      ant.visited_vertex_ids = visited_vertex_ids
-      ant.visited_edge_ids   = visited_edge_ids
-      ant
+      Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id).tap do |ant|
+        ant.visited_vertex_ids = visited_vertex_ids
+        ant.visited_edge_ids   = visited_edge_ids
+      end
     end
 
     before do
@@ -349,32 +349,46 @@ describe Ant::Ant do
   end
 
   describe '#find_path_length' do
-    let(:vertex_inputs) do
-      [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }]
+    let(:edge1) do
+      instance_double(
+        Graph::Edge, id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2
+      )
     end
-    let(:edge_inputs) do
-      [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
-       { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
-       { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }]
+    let(:edge2) do
+      instance_double(
+        Graph::Edge, id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3
+      )
     end
-    let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
+    let(:edge3) do
+      instance_double(
+        Graph::Edge, id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1
+      )
+    end
+    let(:edge_class) { class_double('Graph::Edge') }
+    let(:current_vertex_id)  { 1 }
+    let(:ant_id)             { 1 }
+    let(:visited_edge_ids)   { [1, 2, 3] }
 
-    before(:each) do
-      generate_vertices(vertex_inputs)
-      generate_edges(edge_inputs, config.initial_trail_density)
+    before do
+      stub_const('Graph::Edge', edge_class)
 
-      Ant::Ant.new(initialize_params)
+      allow(edge_class).to receive(:find).with(1).and_return(edge1)
+      allow(edge_class).to receive(:find).with(2).and_return(edge2)
+      allow(edge_class).to receive(:find).with(3).and_return(edge3)
+    end
 
-      # set up connections on the vertex the ant is on
-      Graph::Vertex.find(1).outgoing_edge_ids = [1, 2, 3]
-
-      ant.current_vertex_id = 1
-      ant.visited_vertex_ids = [1, 2, 3]
-      ant.visited_edge_ids = [1, 2, 3]
+    subject(:ant) do
+      Ant::Ant.new(
+        current_vertex_id: current_vertex_id, id: ant_id
+      ).tap do |ant|
+        ant.visited_edge_ids = visited_edge_ids
+      end
     end
 
     it 'should return the correct path length' do
-      expected_length = edge_inputs.map { |el| el[:cost_of_traversal] }.sum
+      expected_length = [edge1, edge2, edge3].reduce(0) do |sum, edge|
+        sum + edge.cost_of_traversal
+      end
       expect(ant.find_path_length).to eq(expected_length)
     end
   end
