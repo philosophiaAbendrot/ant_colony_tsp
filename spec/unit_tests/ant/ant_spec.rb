@@ -3,6 +3,7 @@
 require 'spec_helper'
 
 # rubocop:disable Metrics/BlockLength
+# rubocop:disable Layout/HashAlignment
 describe Ant::Ant do
   include GeneratorHelpers
 
@@ -418,7 +419,7 @@ describe Ant::Ant do
                       start_vertex_id: 3, end_vertex_id: 1)
     end
     let(:edge_class) { class_double('Graph::Edge') }
-    
+
     let(:q) { 5 }
     let(:visited_edge_ids)   { [1, 2, 3] }
     let(:visited_vertex_ids) { [1, 2, 3] }
@@ -492,3 +493,4 @@ describe Ant::Ant do
   end
 end
 # rubocop:enable Metrics/BlockLength
+# rubocop:enable Layout/HashAlignment
