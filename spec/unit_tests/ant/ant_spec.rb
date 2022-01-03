@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 
+# rubocop:disable Metrics/BlockLength
 describe Ant::Ant do
   include GeneratorHelpers
 
@@ -9,7 +10,6 @@ describe Ant::Ant do
   let!(:current_vertex) { Graph::Vertex.new(x_pos: -5, y_pos: 3, id: current_vertex_id) }
   let(:ant_id) { 1 }
   let(:config) { Config.new.process_configs }
-  let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
 
   before do
     Ant::Ant.set_config(config)
@@ -22,7 +22,7 @@ describe Ant::Ant do
   describe '#initialize' do
     subject(:ant) do
       Ant::Ant.set_config(config)
-      Ant::Ant.new(initialize_params)
+      Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
     end
 
     it { is_expected.not_to be nil }
@@ -43,7 +43,7 @@ describe Ant::Ant do
 
   describe '#current_vertex' do
     subject(:ant) do
-      Ant::Ant.new(initialize_params)
+      Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
     end
 
     it 'should return the vertex associated with the Ant instance' do
@@ -53,7 +53,7 @@ describe Ant::Ant do
 
   describe '#x_pos' do
     subject(:ant) do
-      Ant::Ant.new(initialize_params)
+      Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
     end
 
     it 'should return the x_pos of the current_vertex' do
@@ -63,7 +63,7 @@ describe Ant::Ant do
 
   describe '#y_pos' do
     subject(:ant) do
-      Ant::Ant.new(initialize_params)
+      Ant::Ant.new(current_vertex_id: current_vertex_id, id: ant_id)
     end
 
     it 'should return the y_pos of the current_vertex' do
@@ -128,11 +128,12 @@ describe Ant::Ant do
       )
     end
     let(:current_vertex_id) { 1 }
-    let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
     subject(:ant) do
       config.process_configs
       Ant::Ant.set_config(config)
-      Ant::Ant.new(initialize_params).tap do |ant|
+      Ant::Ant.new(
+        current_vertex_id: current_vertex_id, id: ant_id
+      ).tap do |ant|
         ant.current_vertex_id  = current_vertex_id
         ant.visited_vertex_ids = [current_vertex_id]
       end
@@ -170,7 +171,9 @@ describe Ant::Ant do
 
       # sum = (tau_1_3 * eta_1_3 + tau_1_4 * eta_1_4 + tau_1_2 * eta_1_2).to_f
 
-      # hashed_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum, edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum, edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
+      # hashed_result = { edge_1.end_vertex_id => tau_1_3 * eta_1_3 / sum,
+      # edge_2.end_vertex_id => tau_1_4 * eta_1_4 / sum,
+      # edge_3.end_vertex_id => tau_1_2 * eta_1_2 / sum }
       # cumulative_probability_mapping = []
       # cumulative_prob = 0
       # cumulative_prob += hashed_result[edge_1.end_vertex_id]
@@ -396,7 +399,7 @@ describe Ant::Ant do
     end
   end
 
-  describe 'lay_phermones' do
+  describe '#lay_phermones' do
     let(:edge_inputs) do
       [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
        { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
@@ -453,47 +456,39 @@ describe Ant::Ant do
     end
   end
 
-  describe 'reset_to_original_position' do
-    let(:vertex_inputs) do
-      [{ id: 1, x_pos: 5.3, y_pos: 8.9 }, { id: 2, x_pos: -8.4, y_pos: 7.2 }, { id: 3, x_pos: -4, y_pos: -6 }]
+  describe '.reset_to_original_position' do
+    let(:start_vertex_id1) { 55 }
+    let(:start_vertex_id2) { 91 }
+    let!(:ant1) do
+      Ant::Ant.new(current_vertex_id: start_vertex_id1, id: 20).tap do |ant|
+        ant.visited_edge_ids = [start_vertex_id1, 61, 38, 15]
+      end
     end
-    let(:edge_inputs) do
-      [{ id: 1, cost_of_traversal: 5.3, start_vertex_id: 1, end_vertex_id: 2 },
-       { id: 2, cost_of_traversal: 7.0, start_vertex_id: 2, end_vertex_id: 3 },
-       { id: 3, cost_of_traversal: 1.1, start_vertex_id: 3, end_vertex_id: 1 }]
-    end
-    let(:initialize_params) { { current_vertex_id: current_vertex_id, id: ant_id } }
-
-    before(:each) do
-      generate_vertices(vertex_inputs)
-      generate_edges(edge_inputs, config.initial_trail_density)
-
-      Ant::Ant.new(initialize_params)
-
-      # set up connections on the vertex the ant is on
-      vertex_1 = Graph::Vertex.find(1)
-      vertex_1.outgoing_edge_ids = [1, 2, 3]
-
-      ant.current_vertex_id = 3
-      ant.visited_vertex_ids = [1, 2, 3]
-      ant.visited_edge_ids = [1, 2, 3]
+    let!(:ant2) do
+      Ant::Ant.new(current_vertex_id: start_vertex_id2, id: 33).tap do |ant|
+        ant.visited_edge_ids = [start_vertex_id2, 59, 69, 94]
+      end
     end
 
-    it 'should clear visited edge ids' do
-      Ant::Ant.reset_to_original_position
-      expect(ant.visited_edge_ids).to eq([])
+    subject { Ant::Ant.reset_to_original_position }
+
+    it 'should clear visited edge ids', :aggregate_failures do
+      subject
+      expect(ant1.visited_edge_ids).to eq([])
+      expect(ant2.visited_edge_ids).to eq([])
     end
 
-    it 'should clear visited vertex ids' do
-      original_vertex_id = ant.visited_vertex_ids[0]
-      Ant::Ant.reset_to_original_position
-      expect(ant.visited_vertex_ids).to eq([original_vertex_id])
+    it 'should clear visited vertex ids', :aggregate_failures do
+      subject
+      expect(ant1.visited_vertex_ids).to eq([start_vertex_id1])
+      expect(ant2.visited_vertex_ids).to eq([start_vertex_id2])
     end
 
-    it 'should place ant in the original position' do
-      original_vertex_id = ant.visited_vertex_ids[0]
-      Ant::Ant.reset_to_original_position
-      expect(ant.current_vertex_id).to eq(original_vertex_id)
+    it 'should place ant in the original position', :aggregate_failures do
+      subject
+      expect(ant1.current_vertex_id).to eq(start_vertex_id1)
+      expect(ant2.current_vertex_id).to eq(start_vertex_id2)
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
