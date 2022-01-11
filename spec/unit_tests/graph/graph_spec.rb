@@ -10,16 +10,20 @@ describe Graph::Graph do
     end
     let(:vertex_params) { [{ id: 3, x_pos: 4, y_pos: 5 }, { id: 4, x_pos: 5.0, y_pos: 6.0 }] }
     let(:config) { Config.new.process_configs }
-    let(:mock_vertex_instance_3) { double('vertex_3', outgoing_edge_ids: []) }
-    let(:mock_vertex_instance_4) { double('vertex_4', outgoing_edge_ids: []) }
-    let(:mock_edge_instance_1) do
-      double('edge_1', id: 1, start_vertex_id: 3, end_vertex_id: 4, start_vertex: mock_vertex_instance_3,
-                       end_vertex: mock_vertex_instance_4)
+    let(:vertex3) { instance_double(Graph::Vertex, outgoing_edge_ids: []) }
+    let(:vertex4) { instance_double(Graph::Vertex, outgoing_edge_ids: []) }
+    let(:edge1) do
+      instance_double(Graph::Edge, id: 1, start_vertex_id: 3, end_vertex_id: 4,
+                                   start_vertex: vertex3,
+                                   end_vertex: vertex4)
     end
-    let(:mock_edge_instance_2) do
-      double('edge_2', id: 2, start_vertex_id: 4, end_vertex_id: 3, start_vertex: mock_vertex_instance_4,
-                       end_vertex: mock_vertex_instance_3)
+    let(:edge2) do
+      instance_double(Graph::Edge, id: 2, start_vertex_id: 4, end_vertex_id: 3,
+                                   start_vertex: vertex4,
+                                   end_vertex: vertex3)
     end
+    let(:edge_class) { class_double('Graph::Edge') }
+    let(:vertex_class) { class_double('Graph::Vertex') }
     let(:initial_trail_density) { 5 }
     let(:rho) { 0.7 }
 
@@ -27,36 +31,23 @@ describe Graph::Graph do
       config.initial_trail_density = initial_trail_density
       config.rho = rho
       config.process_configs
-      Graph::Graph.set_config(config)
-      Graph::Edge.set_config(config)
-
       Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params)
     end
 
-    def generate_graph
-      config.initial_trail_density = initial_trail_density
-      config.rho = rho
-      config.process_configs
-      Graph::Graph.set_config(config)
-      Graph::Edge.set_config(config)
+    before do
+      allow(edge_class).to receive(:find).with(1).and_return(edge1)
+      allow(edge_class).to receive(:find).with(2).and_return(edge2)
+      allow(edge_class).to receive(:all).and_return([edge1, edge2])
+      allow(edge_class).to receive(:initialize_trail_densities)
+      allow(edge_class).to receive(:new)
 
-      Graph::Graph.new(edge_inputs: edge_params, vertex_inputs: vertex_params)
-    end
-
-    before(:each) do
-      Graph::Vertex.destroy_all
-      Graph::Edge.destroy_all
-      allow(Graph::Edge).to receive(:find).with(1).and_return(mock_edge_instance_1)
-      allow(Graph::Edge).to receive(:find).with(2).and_return(mock_edge_instance_2)
-      allow(Graph::Edge).to receive(:all).and_return([mock_edge_instance_1, mock_edge_instance_2])
-      allow(Graph::Edge).to receive(:initialize_trail_densities)
+      stub_const('Graph::Edge', edge_class)
+      stub_const('Graph::Vertex', vertex_class)
     end
 
     describe 'vertices should be initialized' do
-      let(:vertex_instance_double) { instance_double(Graph::Vertex) }
-
       it 'should call Vertex.new for each vertex entry passed' do
-        expect(Graph::Vertex).to receive(:new).exactly(vertex_params.length).times
+        expect(vertex_class).to receive(:new).exactly(vertex_params.length).times
         generate_graph
       end
 
@@ -66,7 +57,7 @@ describe Graph::Graph do
         it 'vertex parameter passed should be in correct format' do
           first_vertex = vertex_params[0]
 
-          expect(Graph::Vertex).to receive(:new)
+          expect(vertex_class).to receive(:new)
             .with(hash_including(
               id:    first_vertex[:id],
               x_pos: first_vertex[:x_pos],
@@ -80,12 +71,12 @@ describe Graph::Graph do
     end
 
     describe 'edges should be initialized' do
-      before(:each) do
-        allow(Graph::Vertex).to receive(:new)
+      before do
+        allow(vertex_class).to receive(:new)
       end
 
       it 'should call Edge.new for each Edge entry passed' do
-        expect(Graph::Edge).to receive(:new).exactly(edge_params.length).times
+        expect(edge_class).to receive(:new).exactly(edge_params.length).times
         generate_graph
       end
 
@@ -94,7 +85,7 @@ describe Graph::Graph do
 
         it 'edge parameter passed should be in correct format' do
           first_edge = edge_params[0]
-          expect(Graph::Edge).to receive(:new).with(
+          expect(edge_class).to receive(:new).with(
             hash_including(
               id:                first_edge[:id],
               start_vertex_id:   first_edge[:start_vertex_id],
@@ -132,10 +123,9 @@ describe Graph::Graph do
         )
       end
 
-      before(:each) do
-        Graph::Vertex.destroy_all
-        Graph::Edge.destroy_all
-        allow(Graph::Edge).to receive(:all).and_return([edge1, edge2])
+      before do
+        allow(edge_class).to receive(:all).and_return([edge1, edge2])
+        allow(vertex_class).to receive(:new)
       end
 
       it 'outgoing edge ids should be populated' do
