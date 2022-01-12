@@ -20,14 +20,6 @@ require_relative 'errors'
 #   Runs ant colony optimization logic.
 #   Exports data.
 class PathFinder
-  private
-
-  attr_reader :num_vertices, :edge_inputs, :vertex_inputs,
-              :include_path_length_vs_iteration, :num_ants,
-              :num_iterations, :graph
-
-  public
-
   @config = nil
 
   def initialize(edge_inputs:, vertex_inputs:,
@@ -112,7 +104,10 @@ class PathFinder
   def self.execute(edge_inputs:, vertex_inputs:,
                    include_path_length_vs_iteration: false)
     edge_inputs = edge_inputs.map { |edge| edge.transform_keys!(&:to_sym) }
-    vertex_inputs = vertex_inputs.map { |vertex| vertex.transform_keys!(&:to_sym) }
+    vertex_inputs = vertex_inputs.map do |vertex|
+      vertex.transform_keys!(&:to_sym)
+    end
+
     new(
       edge_inputs:                      edge_inputs,
       vertex_inputs:                    vertex_inputs,
@@ -141,7 +136,7 @@ class PathFinder
     initialize_ants
     presenter = PathFinderOutputPresenter.new(
       optimized_path,
-      include_path_length_vs_iteration: include_path_length_vs_iteration
+      include_path_length_vs_iteration: @include_path_length_vs_iteration
     )
     destroy_graph
     presenter.formatted_hash
@@ -150,12 +145,13 @@ class PathFinder
   private
 
   def initialize_graph
-    @graph = Graph::Graph.new(edge_inputs: edge_inputs, vertex_inputs: vertex_inputs)
+    @graph = Graph::Graph.new(edge_inputs:   @edge_inputs,
+                              vertex_inputs: @vertex_inputs)
   end
 
   def initialize_ants
     AntInitializerService.new(
-      num_ants,
+      @num_ants,
       Graph::Vertex.all
     ).execute
   end
@@ -163,12 +159,13 @@ class PathFinder
   def optimized_path
     path = OptimizedPath.new(
       ants:                             Ant::Ant.all,
-      num_iterations:                   num_iterations,
-      num_vertices:                     num_vertices,
-      include_path_length_vs_iteration: include_path_length_vs_iteration
+      num_iterations:                   @num_iterations,
+      num_vertices:                     @num_vertices,
+      include_path_length_vs_iteration: @include_path_length_vs_iteration
     )
     if path.shortest_path_length == Float::INFINITY
-      raise PathNotFoundError, 'Failed to find a tour. The graph may not have a valid path.'
+      raise PathNotFoundError, 'Failed to find a tour.'\
+                               'The graph may not have a valid path.'
     end
     path
   end
