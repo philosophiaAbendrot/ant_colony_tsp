@@ -3,17 +3,12 @@
 require 'spec_helper'
 
 describe Graph::Vertex do
-  describe 'initialize' do
+  describe '#initialize' do
     let(:vertex_params) { { x_pos: 3.5, y_pos: -5.0, id: 1 } }
-    let(:vertex) { Graph::Vertex.find(vertex_params[:id]) }
 
-    before(:each) do
-      Graph::Vertex.new(vertex_params)
-    end
+    subject(:vertex) { Graph::Vertex.new(vertex_params) }
 
-    it 'should initialize a vertex instance' do
-      expect(vertex).to_not be nil
-    end
+    it { is_expected.not_to be nil }
 
     it 'should correctly set x_pos' do
       expect(vertex.x_pos).to eq(vertex_params[:x_pos])
